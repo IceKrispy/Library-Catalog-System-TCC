@@ -21,6 +21,8 @@ Set `VITE_API_BASE_URL` to your deployed backend URL, for example:
 VITE_API_BASE_URL=https://your-backend.example.com/api/v1
 ```
 
+The frontend also accepts the backend root URL and will normalize it to `/api/v1`, but using the full API URL is recommended for clarity.
+
 ## CLI deploy
 
 From the project root:
