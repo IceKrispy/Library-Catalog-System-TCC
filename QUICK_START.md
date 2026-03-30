@@ -8,7 +8,7 @@ This guide walks you through setting up the Library Management System's Catalogi
 
 Ensure you have installed:
 - **Node.js** (v16+) and npm
-- **SQLite 3** command-line tool
+- No database installation required
 - **Git** (optional, for version control)
 
 ---
@@ -42,7 +42,7 @@ npm init -y
 ### 2.2 Install Dependencies
 
 ```bash
-npm install express cors better-sqlite3 dotenv node-fetch
+npm install express cors dotenv node-fetch
 npm install --save-dev nodemon
 ```
 
@@ -56,11 +56,9 @@ touch src/server.js .env .gitignore
 ### 2.4 Create Database
 
 ```bash
-# Navigate to docs where DATABASE_SCHEMA.sql is stored
-sqlite3 ../catalog.db < ../docs/DATABASE_SCHEMA.sql
-
-# Verify tables were created
-sqlite3 ../catalog.db ".tables"
+# No schema import is required.
+# The backend starts with seeded sample data in memory.
+npm start
 ```
 
 ### 2.5 Create Environment File
@@ -130,11 +128,7 @@ Update the `scripts` section:
 
 Create `backend/src/db/database.js`:
 ```javascript
-const Database = require('better-sqlite3');
-const path = require('path');
-require('dotenv').config();
-
-const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../catalog.db');
+const store = require('../data/store');
 const db = new Database(dbPath);
 
 // Enable foreign keys
@@ -455,10 +449,8 @@ npm run dev
 The schema already includes sample data from the DATABASE_SCHEMA.sql file. You can manipulate it:
 
 ```bash
-sqlite3 ../catalog.db
-# You're now in SQLite CLI
-SELECT * FROM books;
-# You should see sample books
+curl http://localhost:5000/api/v1/books
+# You should see seeded sample books
 ```
 
 ### 5.2 Test Full Integration
@@ -526,8 +518,8 @@ npm run dev
 # Production
 npm start
 
-# Database operations
-sqlite3 ../catalog.db
+# API operations
+curl http://localhost:5000/api/v1/health
 ```
 
 ### Frontend

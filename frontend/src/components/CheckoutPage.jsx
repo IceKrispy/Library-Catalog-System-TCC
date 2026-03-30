@@ -21,7 +21,7 @@ function getItemTypeFromFormat(format) {
   if (normalized === 'hardcover' || normalized === 'paperback' || normalized === 'audiobook') {
     return normalized;
   }
-  if (normalized === 'ebook') {
+  if (normalized === 'ebook' || normalized === 'e-book') {
     return 'ebook';
   }
   return 'book';

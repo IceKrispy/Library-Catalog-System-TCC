@@ -7,7 +7,7 @@ This document provides a comprehensive technical design for the **Cataloging Sub
 **Tech Stack**:
 - **Frontend**: React, Vite, React Router, Tailwind CSS
 - **Backend**: Node.js, Express.js, CORS
-- **Database**: SQLite 3, better-sqlite3
+- **Data Layer**: In-memory JavaScript store
 
 ---
 
@@ -61,7 +61,7 @@ This document provides a comprehensive technical design for the **Cataloging Sub
 └──────────────────┬──────────────────────────────────────┘
                    │
 ┌──────────────────┴──────────────────────────────────────┐
-│  Data Access Layer (better-sqlite3)                     │
+│  Data Access Layer (in-memory store)                    │
 │  - Database Connection Pool                             │
 │  - Query Execution                                      │
 │  - Transaction Management                              │
@@ -70,8 +70,8 @@ This document provides a comprehensive technical design for the **Cataloging Sub
      ┌─────────────┼─────────────┐
      │             │             │
 ┌────▼─────┐ ┌───▼──────┐ ┌───▼──────┐
-│  SQLite   │ │ External │ │  Cache   │
-│  Database │ │   APIs   │ │   Layer  │
+│ In-Memory │ │ External │ │  Cache   │
+│   Store   │ │   APIs   │ │   Layer  │
 │           │ │ (Google  │ │(In-Mem)  │
 │           │ │ Books,   │ │          │
 │           │ │ Open Lib)│ │          │
@@ -338,7 +338,7 @@ CREATE VIRTUAL TABLE books_fts USING fts5(
    - Frequently accessed categories
    - Publisher lists
    - Author information
-5. **Database Pooling**: Use connection pooling with better-sqlite3
+5. **Data Layer Simplicity**: Keep the runtime dependency-free during local development
 
 ### Caching Strategy
 
@@ -393,7 +393,7 @@ db.get(`SELECT * FROM books WHERE isbn = '${userInput}'`);
 ## Implementation Roadmap
 
 ### Phase 1: Foundation (Week 1-2)
-- [ ] Set up SQLite database with schema
+- [ ] Seed the in-memory store with sample records
 - [ ] Initialize Express.js backend
 - [ ] Implement basic CRUD endpoints for Books
 - [ ] Set up React frontend with book list view
@@ -494,7 +494,7 @@ library-system/
 
 ```bash
 cd backend
-npm install express cors better-sqlite3 dotenv node-fetch
+npm install express cors dotenv node-fetch
 npm start
 ```
 
@@ -509,7 +509,7 @@ npm run dev
 ### 3. Create Database
 
 ```bash
-sqlite3 catalog.db < ../DATABASE_SCHEMA.sql
+npm start
 ```
 
 ### 4. Configure Environment

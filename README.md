@@ -2,7 +2,7 @@
 
 ## Complete Design Package Overview
 
-This package contains a comprehensive technical design for the **Cataloging Subsystem** of a modern Library Management System. All components are production-ready and follow best practices for Node.js, Express.js, React, and SQLite development.
+This package contains a comprehensive technical design for the **Cataloging Subsystem** of a modern Library Management System. All components are production-ready and follow best practices for Node.js, Express.js, React, and lightweight in-memory service development.
 
 ---
 
@@ -112,7 +112,7 @@ This package contains a comprehensive technical design for the **Cataloging Subs
 **Step-by-step implementation guide to get up and running**
 
 **Covers:**
-1. Backend setup (Express.js + SQLite)
+1. Backend setup (Express.js + in-memory store)
 2. Frontend setup (React + Vite + Tailwind)
 3. Database initialization
 4. First API endpoint implementation
@@ -142,7 +142,7 @@ This package contains a comprehensive technical design for the **Cataloging Subs
 
 - **Frontend**: React, Vite, React Router, Tailwind CSS
 - **Backend**: Node.js, Express.js, CORS
-- **Database**: SQLite 3, better-sqlite3
+- **Data Layer**: In-memory JavaScript store
 - **External APIs**: Google Books API, Open Library API
 
 ---
@@ -163,9 +163,9 @@ npm install
 npm run dev  # Starts on http://localhost:5173
 ```
 
-### Database
+### Backend Seed Data
 ```bash
-sqlite3 catalog.db < DATABASE_SCHEMA.sql
+npm run start
 ```
 
 See **QUICK_START.md** for detailed setup instructions.
@@ -301,8 +301,8 @@ cd backend && npm run dev
 # Terminal 2 - Frontend
 cd frontend && npm run dev
 
-# Terminal 3 - Database (if needed)
-sqlite3 catalog.db
+# Terminal 3 - Optional API checks
+curl http://localhost:5000/api/v1/books
 ```
 
 ### For Testing
@@ -314,10 +314,10 @@ sqlite3 catalog.db
 
 ## 📚 Learning Resources in Each File
 
-### DATABASE_SCHEMA.sql
-- Learn SQLite best practices
-- See real-world relationship design
-- Understand indexing strategies
+### In-Memory Store
+- Learn how seeded sample records are structured
+- See how the API stays consistent without a database
+- Extend the store or swap it for a persistent backend later
 
 ### API_DESIGN.md
 - RESTful API design patterns
@@ -436,8 +436,8 @@ Library System/
 
 ## 💡 Key Design Decisions
 
-1. **SQLite instead of larger DB** - Good for library systems up to 1M+ books
-2. **Better-sqlite3 for performance** - Synchronous for simpler error handling
+1. **In-memory store for simplicity** - Zero database setup during local development
+2. **Plain JavaScript data layer** - Easy to swap for a persistent service later
 3. **REST API design** - Standard, well-understood, easy to extend
 4. **Dual external API strategy** - Reliability through redundancy
 5. **Separate physical/digital** - Fundamentally different inventory types

@@ -4,7 +4,7 @@
 
 Deploy the frontend to Vercel and host the backend on a service that supports persistent databases.
 
-This project's backend currently uses `better-sqlite3` with a local `catalog.db` file. Vercel Functions do not provide shared persistent local storage, so the current backend is not a safe fit for Vercel production deployments.
+This project's backend currently uses an in-memory data store, so it can run without database setup, but data resets on restart unless you connect a persistent backend.
 
 ## Frontend on Vercel
 
@@ -40,7 +40,7 @@ npx vercel --prod --cwd frontend
 
 ## Backend options
 
-For the current Express + SQLite backend, use a host with persistent disk or move the database to a hosted service first.
+For the current Express backend, use any Node host for demos. If you need persistent production data, connect a hosted database or API service first.
 
 Good next-step options:
 
