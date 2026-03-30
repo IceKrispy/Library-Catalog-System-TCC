@@ -289,7 +289,7 @@ export default function BookList({ user, onLogout }) {
             </div>
 
             {successMessage && (
-              <div className="mb-6 rounded-lg border border-green-300 bg-green-50 p-4 text-green-700">
+              <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-700">
                 {successMessage}
               </div>
             )}
@@ -385,7 +385,7 @@ export default function BookList({ user, onLogout }) {
                     Checkout is now on its own circulation page, and automated due dates live under settings.
                   </p>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <button type="button" onClick={() => navigate('/checkout')} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                    <button type="button" onClick={() => navigate('/checkout')} className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
                       Open Checkout Page
                     </button>
                     <button type="button" onClick={() => navigate('/settings')} className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
@@ -443,14 +443,14 @@ export default function BookList({ user, onLogout }) {
                                 </div>
                                 <div>
                                   <p className="text-sm text-gray-600">Available</p>
-                                  <p className={`text-lg font-bold ${(book.available_copies || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  <p className={`text-lg font-bold ${(book.available_copies || 0) > 0 ? 'text-blue-600' : 'text-red-600'}`}>
                                     {book.available_copies || 0}
                                   </p>
                                 </div>
                               </div>
 
                               <div className="mb-2 flex gap-2">
-                                <button type="button" onClick={() => navigate(`/checkout?bookId=${book.id}`)} className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-white transition hover:bg-emerald-700">
+                                <button type="button" onClick={() => navigate(`/checkout?bookId=${book.id}`)} className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700">
                                   Checkout
                                 </button>
                                 <button type="button" onClick={() => handleEdit(book.id)} className="flex-1 rounded-lg bg-amber-500 px-4 py-2 text-white transition hover:bg-amber-600">
@@ -517,7 +517,7 @@ export default function BookList({ user, onLogout }) {
                             <h4 className="text-xl font-semibold text-slate-900">{loan.title}</h4>
                             <p className="mt-1 text-sm text-slate-600">Borrower: {loan.borrower_name}</p>
                           </div>
-                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
                             {loan.status}
                           </span>
                         </div>
@@ -556,3 +556,4 @@ export default function BookList({ user, onLogout }) {
     </div>
   );
 }
+

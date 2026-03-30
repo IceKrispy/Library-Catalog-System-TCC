@@ -185,10 +185,10 @@ export default function SettingsPage({ user, onLogout }) {
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <div className="mb-6 rounded-3xl bg-[linear-gradient(135deg,_#0f766e,_#0f172a)] p-6 text-white shadow-xl">
-              <p className="text-sm uppercase tracking-[0.25em] text-emerald-100">Settings</p>
+            <div className="mb-6 rounded-3xl bg-[linear-gradient(135deg,_#1d4ed8,_#0f172a)] p-6 text-white shadow-xl">
+              <p className="text-sm uppercase tracking-[0.25em] text-blue-100">Settings</p>
               <h2 className="mt-2 text-3xl font-bold">System Configuration</h2>
-              <p className="mt-2 max-w-3xl text-sm text-emerald-100">
+              <p className="mt-2 max-w-3xl text-sm text-blue-100">
                 Manage due dates, cataloging standards, patron privacy, notifications, and OPAC behavior from one settings workspace.
               </p>
             </div>
@@ -226,7 +226,7 @@ export default function SettingsPage({ user, onLogout }) {
                         key={section.id}
                         type="button"
                         onClick={() => scrollToSection(section.id)}
-                        className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-left transition hover:bg-emerald-50"
+                        className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-left transition hover:bg-blue-50"
                       >
                         <p className="text-sm font-semibold text-slate-900">{section.label}</p>
                         <p className="text-xs text-slate-500">{section.description}</p>
@@ -251,7 +251,7 @@ export default function SettingsPage({ user, onLogout }) {
                               name="itemType"
                               value={calculator.itemType}
                               onChange={handleCalculatorChange}
-                              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                             >
                               {loanPolicies.map((policy) => (
                                 <option key={policy.itemType} value={policy.itemType}>
@@ -268,7 +268,7 @@ export default function SettingsPage({ user, onLogout }) {
                               type="date"
                               value={calculator.checkoutDate}
                               onChange={handleCalculatorChange}
-                              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                             />
                           </label>
                         </div>
@@ -286,7 +286,7 @@ export default function SettingsPage({ user, onLogout }) {
                             <input
                               value={settings.dueDates.renewalLimit}
                               onChange={(e) => updateSectionField('dueDates', 'renewalLimit', e.target.value)}
-                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                             />
                             <p className="mt-2 text-xs text-slate-500">Maximum number of renewals per item.</p>
                           </label>
@@ -296,7 +296,7 @@ export default function SettingsPage({ user, onLogout }) {
                             <input
                               value={settings.dueDates.holdRequestLimit}
                               onChange={(e) => updateSectionField('dueDates', 'holdRequestLimit', e.target.value)}
-                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                             />
                             <p className="mt-2 text-xs text-slate-500">Maximum number of active holds per user.</p>
                           </label>
@@ -306,7 +306,7 @@ export default function SettingsPage({ user, onLogout }) {
                             <input
                               value={settings.dueDates.gracePeriodDays}
                               onChange={(e) => updateSectionField('dueDates', 'gracePeriodDays', e.target.value)}
-                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                             />
                             <p className="mt-2 text-xs text-slate-500">Buffer days before an item is marked late.</p>
                           </label>
@@ -325,7 +325,7 @@ export default function SettingsPage({ user, onLogout }) {
                               value={settings.dueDates.hardDueDate}
                               onChange={(e) => updateSectionField('dueDates', 'hardDueDate', e.target.value)}
                               disabled={!settings.dueDates.hardDueDateEnabled}
-                              className="mt-3 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
+                              className="mt-3 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100"
                             />
                             <p className="mt-2 text-xs text-slate-500">Force all items back by a semester or inventory deadline.</p>
                           </div>
@@ -333,12 +333,12 @@ export default function SettingsPage({ user, onLogout }) {
                       </div>
                     </div>
 
-                    <div className="self-start rounded-2xl bg-emerald-50 p-4">
+                    <div className="self-start rounded-2xl bg-blue-50 p-4">
                       <h4 className="text-lg font-semibold text-slate-900">Preview</h4>
                       {dueDatePreview ? (
                         <>
                           <div className="mt-4 flex items-center justify-between">
-                            <span className="text-sm font-medium text-emerald-700">{dueDatePreview.label}</span>
+                            <span className="text-sm font-medium text-blue-700">{dueDatePreview.label}</span>
                             <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700">{dueDatePreview.loanPeriodDays} days</span>
                           </div>
 
@@ -386,7 +386,7 @@ export default function SettingsPage({ user, onLogout }) {
                       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <label className="block rounded-2xl bg-white p-4">
                           <span className="mb-1 block text-sm font-medium text-gray-700">Before Due</span>
-                          <input value={settings.dueDates.reminderBeforeDays} onChange={(e) => updateSectionField('dueDates', 'reminderBeforeDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.dueDates.reminderBeforeDays} onChange={(e) => updateSectionField('dueDates', 'reminderBeforeDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                           <p className="mt-2 text-xs text-slate-500">Days before due date.</p>
                         </label>
                         <label className="flex items-center justify-between rounded-2xl bg-white p-4">
@@ -398,7 +398,7 @@ export default function SettingsPage({ user, onLogout }) {
                         </label>
                         <label className="block rounded-2xl bg-white p-4">
                           <span className="mb-1 block text-sm font-medium text-gray-700">After Due</span>
-                          <input value={settings.dueDates.reminderAfterDays} onChange={(e) => updateSectionField('dueDates', 'reminderAfterDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.dueDates.reminderAfterDays} onChange={(e) => updateSectionField('dueDates', 'reminderAfterDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                           <p className="mt-2 text-xs text-slate-500">Days after due date.</p>
                         </label>
                       </div>
@@ -408,15 +408,15 @@ export default function SettingsPage({ user, onLogout }) {
                         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
                           <label className="block">
                             <span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Books</span>
-                            <input value={settings.dueDates.comingDueBookDays} onChange={(e) => updateSectionField('dueDates', 'comingDueBookDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                            <input value={settings.dueDates.comingDueBookDays} onChange={(e) => updateSectionField('dueDates', 'comingDueBookDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                           </label>
                           <label className="block">
                             <span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">DVDs</span>
-                            <input value={settings.dueDates.comingDueDvdDays} onChange={(e) => updateSectionField('dueDates', 'comingDueDvdDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                            <input value={settings.dueDates.comingDueDvdDays} onChange={(e) => updateSectionField('dueDates', 'comingDueDvdDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                           </label>
                           <label className="block">
                             <span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Audiobooks</span>
-                            <input value={settings.dueDates.comingDueAudiobookDays} onChange={(e) => updateSectionField('dueDates', 'comingDueAudiobookDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                            <input value={settings.dueDates.comingDueAudiobookDays} onChange={(e) => updateSectionField('dueDates', 'comingDueAudiobookDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                           </label>
                         </div>
                       </div>
@@ -431,21 +431,21 @@ export default function SettingsPage({ user, onLogout }) {
                       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <label className="block rounded-2xl bg-white p-4">
                           <span className="mb-1 block text-sm font-medium text-gray-700">Books</span>
-                          <input value={settings.dueDates.bookDailyFineRate} onChange={(e) => updateSectionField('dueDates', 'bookDailyFineRate', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.dueDates.bookDailyFineRate} onChange={(e) => updateSectionField('dueDates', 'bookDailyFineRate', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                         <label className="block rounded-2xl bg-white p-4">
                           <span className="mb-1 block text-sm font-medium text-gray-700">DVDs</span>
-                          <input value={settings.dueDates.dvdDailyFineRate} onChange={(e) => updateSectionField('dueDates', 'dvdDailyFineRate', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.dueDates.dvdDailyFineRate} onChange={(e) => updateSectionField('dueDates', 'dvdDailyFineRate', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                         <label className="block rounded-2xl bg-white p-4">
                           <span className="mb-1 block text-sm font-medium text-gray-700">Audiobooks</span>
-                          <input value={settings.dueDates.audiobookDailyFineRate} onChange={(e) => updateSectionField('dueDates', 'audiobookDailyFineRate', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.dueDates.audiobookDailyFineRate} onChange={(e) => updateSectionField('dueDates', 'audiobookDailyFineRate', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                       </div>
 
                       <label className="mt-4 block rounded-2xl bg-white p-4">
                         <span className="mb-1 block text-sm font-medium text-gray-700">Maximum Fine Cap</span>
-                        <input value={settings.dueDates.maxFineCap} onChange={(e) => updateSectionField('dueDates', 'maxFineCap', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                        <input value={settings.dueDates.maxFineCap} onChange={(e) => updateSectionField('dueDates', 'maxFineCap', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         <p className="mt-2 text-xs text-slate-500">Maximum fee before the item is treated as lost.</p>
                       </label>
                     </div>
@@ -475,7 +475,7 @@ export default function SettingsPage({ user, onLogout }) {
                         </label>
                         <label className="block rounded-2xl bg-white p-4">
                           <span className="mb-1 block text-sm font-medium text-gray-700">Holiday Calendar</span>
-                          <input value={settings.dueDates.holidayCalendarName} onChange={(e) => updateSectionField('dueDates', 'holidayCalendarName', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.dueDates.holidayCalendarName} onChange={(e) => updateSectionField('dueDates', 'holidayCalendarName', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                       </div>
 
@@ -484,8 +484,8 @@ export default function SettingsPage({ user, onLogout }) {
                           <span className="text-sm font-medium text-gray-700">Seasonal Rules</span>
                           <input type="checkbox" checked={settings.dueDates.seasonalRuleEnabled} onChange={(e) => updateSectionField('dueDates', 'seasonalRuleEnabled', e.target.checked)} />
                         </label>
-                        <input value={settings.dueDates.seasonalRuleName} onChange={(e) => updateSectionField('dueDates', 'seasonalRuleName', e.target.value)} disabled={!settings.dueDates.seasonalRuleEnabled} className="mt-3 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100" />
-                        <input type="date" value={settings.dueDates.seasonalRuleDate} onChange={(e) => updateSectionField('dueDates', 'seasonalRuleDate', e.target.value)} disabled={!settings.dueDates.seasonalRuleEnabled} className="mt-3 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100" />
+                        <input value={settings.dueDates.seasonalRuleName} onChange={(e) => updateSectionField('dueDates', 'seasonalRuleName', e.target.value)} disabled={!settings.dueDates.seasonalRuleEnabled} className="mt-3 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100" />
+                        <input type="date" value={settings.dueDates.seasonalRuleDate} onChange={(e) => updateSectionField('dueDates', 'seasonalRuleDate', e.target.value)} disabled={!settings.dueDates.seasonalRuleEnabled} className="mt-3 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100" />
                       </div>
                     </div>
 
@@ -497,7 +497,7 @@ export default function SettingsPage({ user, onLogout }) {
 
                       <label className="mt-4 block rounded-2xl bg-white p-4">
                         <span className="mb-1 block text-sm font-medium text-gray-700">Active Patron Tier Preview</span>
-                        <select value={settings.dueDates.patronTierMode} onChange={(e) => updateSectionField('dueDates', 'patronTierMode', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                        <select value={settings.dueDates.patronTierMode} onChange={(e) => updateSectionField('dueDates', 'patronTierMode', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
                           <option value="Student">Student</option>
                           <option value="Faculty">Faculty</option>
                           <option value="Premium Member">Premium Member</option>
@@ -507,15 +507,15 @@ export default function SettingsPage({ user, onLogout }) {
                       <div className="mt-4 grid grid-cols-1 gap-3">
                         <label className="rounded-2xl bg-white p-4">
                           <span className="mb-1 block text-sm font-medium text-gray-700">Student Book Loan Days</span>
-                          <input value={settings.dueDates.studentBookLoanDays} onChange={(e) => updateSectionField('dueDates', 'studentBookLoanDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.dueDates.studentBookLoanDays} onChange={(e) => updateSectionField('dueDates', 'studentBookLoanDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                         <label className="rounded-2xl bg-white p-4">
                           <span className="mb-1 block text-sm font-medium text-gray-700">Faculty Book Loan Days</span>
-                          <input value={settings.dueDates.facultyBookLoanDays} onChange={(e) => updateSectionField('dueDates', 'facultyBookLoanDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.dueDates.facultyBookLoanDays} onChange={(e) => updateSectionField('dueDates', 'facultyBookLoanDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                         <label className="rounded-2xl bg-white p-4">
                           <span className="mb-1 block text-sm font-medium text-gray-700">Premium Member Loan Days</span>
-                          <input value={settings.dueDates.premiumBookLoanDays} onChange={(e) => updateSectionField('dueDates', 'premiumBookLoanDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.dueDates.premiumBookLoanDays} onChange={(e) => updateSectionField('dueDates', 'premiumBookLoanDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                       </div>
                     </div>
@@ -538,7 +538,7 @@ export default function SettingsPage({ user, onLogout }) {
 
                       <label className="block rounded-2xl bg-white p-4">
                         <span className="mb-1 block text-sm font-medium text-gray-700">Renewal Blocker Threshold</span>
-                        <input value={settings.dueDates.renewalFineBlockThreshold} onChange={(e) => updateSectionField('dueDates', 'renewalFineBlockThreshold', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                        <input value={settings.dueDates.renewalFineBlockThreshold} onChange={(e) => updateSectionField('dueDates', 'renewalFineBlockThreshold', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         <p className="mt-2 text-xs text-slate-500">Block renewals when fines exceed this amount.</p>
                       </label>
                     </div>
@@ -553,7 +553,7 @@ export default function SettingsPage({ user, onLogout }) {
                     <div className="rounded-2xl bg-slate-50 p-4">
                       <label className="block">
                         <span className="mb-1 block text-sm font-medium text-gray-700">Default Classification</span>
-                        <select value={settings.cataloging.defaultClassification} onChange={(e) => updateSectionField('cataloging', 'defaultClassification', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                        <select value={settings.cataloging.defaultClassification} onChange={(e) => updateSectionField('cataloging', 'defaultClassification', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
                           <option value="DDC">Dewey Decimal (DDC)</option>
                           <option value="LCC">Library of Congress (LCC)</option>
                           <option value="Custom/Alpha">Custom / Alpha</option>
@@ -578,15 +578,15 @@ export default function SettingsPage({ user, onLogout }) {
                       <div className="space-y-3">
                         <label className="block">
                           <span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Library of Congress</span>
-                          <input value={settings.cataloging.z3950Loc} onChange={(e) => updateSectionField('cataloging', 'z3950Loc', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.cataloging.z3950Loc} onChange={(e) => updateSectionField('cataloging', 'z3950Loc', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                         <label className="block">
                           <span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">WorldCat</span>
-                          <input value={settings.cataloging.z3950WorldCat} onChange={(e) => updateSectionField('cataloging', 'z3950WorldCat', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.cataloging.z3950WorldCat} onChange={(e) => updateSectionField('cataloging', 'z3950WorldCat', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                         <label className="block">
                           <span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">SRU Endpoint</span>
-                          <input value={settings.cataloging.sruLibraryHub} onChange={(e) => updateSectionField('cataloging', 'sruLibraryHub', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.cataloging.sruLibraryHub} onChange={(e) => updateSectionField('cataloging', 'sruLibraryHub', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                       </div>
                     </div>
@@ -597,18 +597,18 @@ export default function SettingsPage({ user, onLogout }) {
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                       <div className="rounded-2xl bg-white p-4">
                         <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Books</p>
-                        <input value={settings.cataloging.mediaCodeBook} onChange={(e) => updateSectionField('cataloging', 'mediaCodeBook', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
-                        <input value={settings.cataloging.mediaIconBook} onChange={(e) => updateSectionField('cataloging', 'mediaIconBook', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                        <input value={settings.cataloging.mediaCodeBook} onChange={(e) => updateSectionField('cataloging', 'mediaCodeBook', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                        <input value={settings.cataloging.mediaIconBook} onChange={(e) => updateSectionField('cataloging', 'mediaIconBook', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                       </div>
                       <div className="rounded-2xl bg-white p-4">
                         <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">DVD</p>
-                        <input value={settings.cataloging.mediaCodeDvd} onChange={(e) => updateSectionField('cataloging', 'mediaCodeDvd', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
-                        <input value={settings.cataloging.mediaIconDvd} onChange={(e) => updateSectionField('cataloging', 'mediaIconDvd', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                        <input value={settings.cataloging.mediaCodeDvd} onChange={(e) => updateSectionField('cataloging', 'mediaCodeDvd', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                        <input value={settings.cataloging.mediaIconDvd} onChange={(e) => updateSectionField('cataloging', 'mediaIconDvd', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                       </div>
                       <div className="rounded-2xl bg-white p-4">
                         <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Audio</p>
-                        <input value={settings.cataloging.mediaCodeAudio} onChange={(e) => updateSectionField('cataloging', 'mediaCodeAudio', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
-                        <input value={settings.cataloging.mediaIconAudio} onChange={(e) => updateSectionField('cataloging', 'mediaIconAudio', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                        <input value={settings.cataloging.mediaCodeAudio} onChange={(e) => updateSectionField('cataloging', 'mediaCodeAudio', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                        <input value={settings.cataloging.mediaIconAudio} onChange={(e) => updateSectionField('cataloging', 'mediaIconAudio', e.target.value)} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                       </div>
                     </div>
                   </div>
@@ -630,7 +630,7 @@ export default function SettingsPage({ user, onLogout }) {
 
                       <label className="mt-4 block">
                         <span className="mb-1 block text-sm font-medium text-gray-700">Password / PIN Requirement</span>
-                        <select value={settings.privacy.passwordRequirement} onChange={(e) => updateSectionField('privacy', 'passwordRequirement', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                        <select value={settings.privacy.passwordRequirement} onChange={(e) => updateSectionField('privacy', 'passwordRequirement', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
                           <option value="4-digit PIN">4-digit PIN</option>
                           <option value="6-digit PIN">6-digit PIN</option>
                           <option value="8-character alphanumeric">8-character alphanumeric</option>
@@ -641,11 +641,11 @@ export default function SettingsPage({ user, onLogout }) {
                       <div className="mt-4 grid grid-cols-2 gap-3">
                         <label className="block">
                           <span className="mb-1 block text-sm font-medium text-gray-700">Auto-Expiration</span>
-                          <input value={settings.privacy.autoExpirationValue} onChange={(e) => updateSectionField('privacy', 'autoExpirationValue', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                          <input value={settings.privacy.autoExpirationValue} onChange={(e) => updateSectionField('privacy', 'autoExpirationValue', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                         </label>
                         <label className="block">
                           <span className="mb-1 block text-sm font-medium text-gray-700">Unit</span>
-                          <select value={settings.privacy.autoExpirationUnit} onChange={(e) => updateSectionField('privacy', 'autoExpirationUnit', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                          <select value={settings.privacy.autoExpirationUnit} onChange={(e) => updateSectionField('privacy', 'autoExpirationUnit', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
                             <option value="Months">Months</option>
                             <option value="Years">Years</option>
                           </select>
@@ -675,26 +675,26 @@ export default function SettingsPage({ user, onLogout }) {
                     <div className="rounded-2xl bg-slate-50 p-4">
                       <p className="mb-3 text-sm font-medium text-gray-700">Trigger Timing</p>
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                        <label className="block"><span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">First Alert</span><input value={settings.notifications.firstAlertDaysBefore} onChange={(e) => updateSectionField('notifications', 'firstAlertDaysBefore', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" /></label>
-                        <label className="block"><span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Second Alert</span><input value={settings.notifications.secondAlertDaysAfter} onChange={(e) => updateSectionField('notifications', 'secondAlertDaysAfter', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" /></label>
-                        <label className="block"><span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Final Notice</span><input value={settings.notifications.finalNoticeDaysAfter} onChange={(e) => updateSectionField('notifications', 'finalNoticeDaysAfter', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" /></label>
+                        <label className="block"><span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">First Alert</span><input value={settings.notifications.firstAlertDaysBefore} onChange={(e) => updateSectionField('notifications', 'firstAlertDaysBefore', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" /></label>
+                        <label className="block"><span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Second Alert</span><input value={settings.notifications.secondAlertDaysAfter} onChange={(e) => updateSectionField('notifications', 'secondAlertDaysAfter', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" /></label>
+                        <label className="block"><span className="mb-1 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Final Notice</span><input value={settings.notifications.finalNoticeDaysAfter} onChange={(e) => updateSectionField('notifications', 'finalNoticeDaysAfter', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" /></label>
                       </div>
 
                       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <label className="block"><span className="mb-1 block text-sm font-medium text-gray-700">SMS Gateway</span><input value={settings.notifications.smsGateway} onChange={(e) => updateSectionField('notifications', 'smsGateway', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" /></label>
-                        <label className="block"><span className="mb-1 block text-sm font-medium text-gray-700">SMTP Server</span><input value={settings.notifications.smtpServer} onChange={(e) => updateSectionField('notifications', 'smtpServer', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" /></label>
+                        <label className="block"><span className="mb-1 block text-sm font-medium text-gray-700">SMS Gateway</span><input value={settings.notifications.smsGateway} onChange={(e) => updateSectionField('notifications', 'smsGateway', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" /></label>
+                        <label className="block"><span className="mb-1 block text-sm font-medium text-gray-700">SMTP Server</span><input value={settings.notifications.smtpServer} onChange={(e) => updateSectionField('notifications', 'smtpServer', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" /></label>
                       </div>
 
                       <label className="mt-4 block">
                         <span className="mb-1 block text-sm font-medium text-gray-700">Pickup Window</span>
-                        <input value={settings.notifications.pickupWindowDays} onChange={(e) => updateSectionField('notifications', 'pickupWindowDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                        <input value={settings.notifications.pickupWindowDays} onChange={(e) => updateSectionField('notifications', 'pickupWindowDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                       </label>
                     </div>
 
                     <div className="rounded-2xl bg-slate-50 p-4">
                       <p className="mb-3 text-sm font-medium text-gray-700">Template Editor</p>
-                      <textarea value={settings.notifications.emailTemplate} onChange={(e) => updateSectionField('notifications', 'emailTemplate', e.target.value)} rows="5" className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
-                      <textarea value={settings.notifications.smsTemplate} onChange={(e) => updateSectionField('notifications', 'smsTemplate', e.target.value)} rows="3" className="mt-3 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" />
+                      <textarea value={settings.notifications.emailTemplate} onChange={(e) => updateSectionField('notifications', 'emailTemplate', e.target.value)} rows="5" className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                      <textarea value={settings.notifications.smsTemplate} onChange={(e) => updateSectionField('notifications', 'smsTemplate', e.target.value)} rows="3" className="mt-3 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                     </div>
                   </div>
                 </section>
@@ -713,7 +713,7 @@ export default function SettingsPage({ user, onLogout }) {
 
                       <label className="mt-4 block">
                         <span className="mb-1 block text-sm font-medium text-gray-700">"New Arrivals" Logic</span>
-                        <select value={settings.opac.newArrivalsDays} onChange={(e) => updateSectionField('opac', 'newArrivalsDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                        <select value={settings.opac.newArrivalsDays} onChange={(e) => updateSectionField('opac', 'newArrivalsDays', e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
                           <option value="30">Last 30 days</option>
                           <option value="60">Last 60 days</option>
                           <option value="90">Last 90 days</option>
@@ -742,3 +742,4 @@ export default function SettingsPage({ user, onLogout }) {
     </div>
   );
 }
+

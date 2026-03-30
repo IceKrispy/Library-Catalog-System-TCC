@@ -75,7 +75,7 @@ export default function LoginPage({ onLogin }) {
 
           <button
             type="submit"
-            className="w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800"
+            className="w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700"
           >
             Login
           </button>

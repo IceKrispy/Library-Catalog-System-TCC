@@ -174,16 +174,16 @@ export default function CheckoutPage({ user, onLogout }) {
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-6xl">
-            <div className="mb-6 rounded-3xl bg-[linear-gradient(135deg,_#166534,_#0f172a)] p-6 text-white shadow-xl">
-              <p className="text-sm uppercase tracking-[0.25em] text-emerald-100">Circulation Tools</p>
+            <div className="mb-6 rounded-3xl bg-[linear-gradient(135deg,_#1d4ed8,_#0f172a)] p-6 text-white shadow-xl">
+              <p className="text-sm uppercase tracking-[0.25em] text-blue-100">Circulation Tools</p>
               <h2 className="mt-2 text-3xl font-bold">Checkout Panel</h2>
-              <p className="mt-2 max-w-2xl text-sm text-emerald-100">
+              <p className="mt-2 max-w-2xl text-sm text-blue-100">
                 Use a dedicated page for borrower checkout so the main dashboard stays focused on catalog management.
               </p>
             </div>
 
             {successMessage && (
-              <div className="mb-6 rounded-lg border border-green-300 bg-green-50 p-4 text-green-700">
+              <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-700">
                 {successMessage}
               </div>
             )}
@@ -208,7 +208,7 @@ export default function CheckoutPage({ user, onLogout }) {
                       name="bookId"
                       value={checkoutForm.bookId}
                       onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     >
                       <option value="">Select a book</option>
                       {books.map((book) => (
@@ -226,7 +226,7 @@ export default function CheckoutPage({ user, onLogout }) {
                       value={checkoutForm.copyId}
                       onChange={handleChange}
                       disabled={availableCopies.length === 0}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100"
                     >
                       {availableCopies.length === 0 ? (
                         <option value="">No available copies</option>
@@ -247,7 +247,7 @@ export default function CheckoutPage({ user, onLogout }) {
                       type="text"
                       value={checkoutForm.borrowerName}
                       onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     />
                   </label>
 
@@ -259,7 +259,7 @@ export default function CheckoutPage({ user, onLogout }) {
                         type="email"
                         value={checkoutForm.borrowerEmail}
                         onChange={handleChange}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                       />
                     </label>
 
@@ -270,7 +270,7 @@ export default function CheckoutPage({ user, onLogout }) {
                         type="text"
                         value={checkoutForm.borrowerId}
                         onChange={handleChange}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                       />
                     </label>
                   </div>
@@ -282,7 +282,7 @@ export default function CheckoutPage({ user, onLogout }) {
                         name="itemType"
                         value={checkoutForm.itemType}
                         onChange={handleChange}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                       >
                         {loanPolicies.map((policy) => (
                           <option key={policy.itemType} value={policy.itemType}>
@@ -299,7 +299,7 @@ export default function CheckoutPage({ user, onLogout }) {
                         type="date"
                         value={checkoutForm.checkoutDate}
                         onChange={handleChange}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                       />
                     </label>
                   </div>
@@ -311,7 +311,7 @@ export default function CheckoutPage({ user, onLogout }) {
                       rows="4"
                       value={checkoutForm.notes}
                       onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     />
                   </label>
 
@@ -323,7 +323,7 @@ export default function CheckoutPage({ user, onLogout }) {
                       !checkoutForm.copyId ||
                       !checkoutForm.borrowerName.trim()
                     }
-                    className="w-full rounded-lg bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isCheckingOut ? 'Checking Out...' : 'Confirm Checkout'}
                   </button>
@@ -340,9 +340,9 @@ export default function CheckoutPage({ user, onLogout }) {
                 </div>
 
                 {dueDatePreview && (
-                  <div className="mt-4 rounded-2xl bg-emerald-50 p-4">
+                  <div className="mt-4 rounded-2xl bg-blue-50 p-4">
                     <div className="mb-3 flex items-center justify-between">
-                      <span className="text-sm font-medium text-emerald-700">{dueDatePreview.label}</span>
+                      <span className="text-sm font-medium text-blue-700">{dueDatePreview.label}</span>
                       <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700">
                         {dueDatePreview.loanPeriodDays} days
                       </span>
