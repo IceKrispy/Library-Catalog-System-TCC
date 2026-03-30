@@ -2,8 +2,16 @@ const { createClient } = require('@supabase/supabase-js');
 
 let cachedClient = null;
 
+function getSupabaseConfigStatus() {
+  return {
+    supabaseUrl: Boolean(process.env.SUPABASE_URL),
+    supabaseAnonKey: Boolean(process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY)
+  };
+}
+
 function hasSupabaseConfig() {
-  return Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY));
+  const status = getSupabaseConfigStatus();
+  return status.supabaseUrl && status.supabaseAnonKey;
 }
 
 function getSupabase() {
@@ -39,5 +47,6 @@ const supabase = new Proxy({}, {
 module.exports = {
   supabase,
   getSupabase,
-  hasSupabaseConfig
+  hasSupabaseConfig,
+  getSupabaseConfigStatus
 };

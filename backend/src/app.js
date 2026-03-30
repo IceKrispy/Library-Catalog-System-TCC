@@ -7,7 +7,7 @@ require('dotenv').config({
 
 const booksRouter = require('./routes/books');
 const circulationRouter = require('./routes/circulation');
-const { hasSupabaseConfig } = require('./lib/supabase');
+const { hasSupabaseConfig, getSupabaseConfigStatus } = require('./lib/supabase');
 
 const app = express();
 
@@ -65,11 +65,14 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/v1/health', (req, res) => {
+  const configStatus = getSupabaseConfigStatus();
+
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
     message: 'Cataloging API is running',
-    databaseConfigured: hasSupabaseConfig()
+    databaseConfigured: hasSupabaseConfig(),
+    config: configStatus
   });
 });
 
