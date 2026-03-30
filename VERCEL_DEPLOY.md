@@ -2,9 +2,9 @@
 
 ## Recommended setup
 
-Deploy the frontend to Vercel and host the backend on a service that supports persistent databases.
+You can deploy the frontend and backend separately on Vercel.
 
-This project's backend currently uses an in-memory data store, so it can run without database setup, but data resets on restart unless you connect a persistent backend.
+The backend now includes a serverless entrypoint in `backend/api/index.js` and expects Supabase environment variables to be configured in the Vercel project.
 
 ## Frontend on Vercel
 
@@ -38,14 +38,21 @@ npx vercel --prod --cwd frontend
 3. Add `VITE_API_BASE_URL` in the project's Environment Variables.
 4. Deploy.
 
-## Backend options
+## Backend on Vercel
 
-For the current Express backend, use any Node host for demos. If you need persistent production data, connect a hosted database or API service first.
+The backend can be deployed as its own Vercel project:
 
-Good next-step options:
+- Root directory: `backend`
+- Build/runtime config: included in `backend/vercel.json`
+- Required environment variables:
+  - `SUPABASE_URL`
+  - `SUPABASE_ANON_KEY`
+  - `CORS_ORIGIN` for your frontend URL, if you want to restrict origins explicitly
 
-- Railway
-- Render
-- Fly.io
-- Supabase Postgres
-- Neon Postgres
+After deployment, verify the backend with:
+
+```text
+https://your-backend-domain.vercel.app/api/v1/health
+```
+
+If the response shows `"databaseConfigured": false`, your Vercel environment variables are missing or named incorrectly.
