@@ -13,6 +13,13 @@ function normalizeApiBaseUrl(value) {
 
 const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
+if (import.meta.env.PROD && !import.meta.env.VITE_API_BASE_URL) {
+  console.warn(
+    'VITE_API_BASE_URL is not set. The frontend is using /api/v1 on the current domain. ' +
+    'If your backend is deployed separately, set VITE_API_BASE_URL to your backend URL.'
+  );
+}
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
