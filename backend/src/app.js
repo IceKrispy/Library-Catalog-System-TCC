@@ -51,6 +51,19 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Library System API',
+    status: 'OK',
+    message: 'Backend is running',
+    endpoints: {
+      root: '/',
+      api: '/api/v1',
+      health: '/api/v1/health'
+    }
+  });
+});
+
 app.get('/api/v1/health', (req, res) => {
   res.json({
     status: 'OK',
