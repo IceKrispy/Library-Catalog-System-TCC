@@ -8,6 +8,7 @@ const DEFAULT_CREDENTIALS = {
 export default function LoginPage({ onLogin }) {
   const [credentials, setCredentials] = useState(DEFAULT_CREDENTIALS);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,13 +68,22 @@ export default function LoginPage({ onLogin }) {
 
             <label className="block">
               <span className="mb-1 block text-sm font-medium text-slate-700">Password</span>
-              <input
-                name="password"
-                type="password"
-                value={credentials.password}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-              />
+              <div className="relative">
+                <input
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={credentials.password}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-20 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  className="absolute inset-y-0 right-3 my-auto h-fit text-sm font-medium text-blue-600 transition hover:text-blue-700"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
             </label>
 
             {error && (
