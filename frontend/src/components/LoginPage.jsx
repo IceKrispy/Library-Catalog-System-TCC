@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 const DEFAULT_CREDENTIALS = {
-  username: 'admin',
-  password: 'library123'
+  username: '',
+  password: ''
 };
 
 export default function LoginPage({ onLogin }) {
