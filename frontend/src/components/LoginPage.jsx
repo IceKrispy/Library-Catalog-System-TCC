@@ -90,10 +90,6 @@ export default function LoginPage({ onLogin }) {
             </button>
           </form>
 
-          <div className="mt-6 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
-            Demo credentials: <span className="font-semibold text-slate-900">admin</span> /{' '}
-            <span className="font-semibold text-slate-900">library123</span>
-          </div>
         </div>
       </div>
     </div>
