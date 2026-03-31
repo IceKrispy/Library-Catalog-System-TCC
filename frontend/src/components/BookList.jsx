@@ -140,10 +140,15 @@ export default function BookList({ user, onLogout }) {
   const [detailLoading, setDetailLoading] = useState(false);
   const [selectedCopyId, setSelectedCopyId] = useState(null);
   const [isAddBookOpen, setIsAddBookOpen] = useState(false);
+  const trimmedSearchQuery = searchQuery.trim();
 
   useEffect(() => {
-    loadBooks();
-  }, [page]);
+    const timeoutId = window.setTimeout(() => {
+      loadBooks({ query: trimmedSearchQuery, page });
+    }, trimmedSearchQuery ? 250 : 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [page, trimmedSearchQuery]);
 
   useEffect(() => {
     loadLoans();
@@ -227,20 +232,13 @@ export default function BookList({ user, onLogout }) {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-
-    if (!searchQuery.trim()) {
-      setPage(1);
-      await loadBooks({ query: '', page: 1 });
-      return;
-    }
-
-    await loadBooks({ query: searchQuery.trim(), page: 1 });
+    setPage(1);
+    await loadBooks({ query: trimmedSearchQuery, page: 1 });
   };
 
-  const handleResetSearch = async () => {
+  const handleResetSearch = () => {
     setSearchQuery('');
     setPage(1);
-    await loadBooks({ query: '', page: 1 });
   };
 
   const handleFormChange = (e) => {
@@ -595,7 +593,10 @@ export default function BookList({ user, onLogout }) {
               <>
                 <form onSubmit={handleSearch} className="mb-6">
                   <div className="flex flex-col gap-2 sm:flex-row">
-                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search books by title, ISBN, or description..." className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                    <input type="text" value={searchQuery} onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setPage(1);
+                    }} placeholder="Search books by title, ISBN, or description..." className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                     <button type="submit" className="rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700">Search</button>
                     <button type="button" onClick={handleResetSearch} className="rounded-lg bg-gray-300 px-6 py-2 text-gray-800 transition hover:bg-gray-400">Reset</button>
                   </div>
