@@ -138,6 +138,7 @@ export default function BookList({ user, onLogout }) {
   const [sortConfig, setSortConfig] = useState({ key: 'title', direction: 'asc' });
   const [selectedBook, setSelectedBook] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [selectedCopyId, setSelectedCopyId] = useState(null);
 
   useEffect(() => {
     loadBooks();
@@ -329,6 +330,7 @@ export default function BookList({ user, onLogout }) {
       setError(null);
       const response = await booksAPI.getById(bookId);
       setSelectedBook(response.data);
+      setSelectedCopyId(response.data?.copies?.[0]?.id || null);
     } catch (err) {
       console.error('Error loading book details:', err);
       setError(err.response?.data?.message || err.message || 'Failed to load book details');
@@ -340,6 +342,7 @@ export default function BookList({ user, onLogout }) {
   const closeDetails = () => {
     setSelectedBook(null);
     setDetailLoading(false);
+    setSelectedCopyId(null);
   };
 
   const handleDelete = async (bookId, title) => {
@@ -1006,6 +1009,15 @@ export default function BookList({ user, onLogout }) {
                           </div>
                         </div>
 
+                        {loan.notes && (
+                          <div className="mt-4 rounded-2xl bg-white p-4">
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                              Notes
+                            </p>
+                            <p className="mt-2 text-sm leading-6 text-slate-700">{loan.notes}</p>
+                          </div>
+                        )}
+
                         <button type="button" onClick={() => handleReturnLoan(loan.id)} disabled={returningLoanId === loan.id} className="mt-4 w-full rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50">
                           {returningLoanId === loan.id ? 'Returning...' : 'Mark as Returned'}
                         </button>
@@ -1089,6 +1101,12 @@ export default function BookList({ user, onLogout }) {
                 </div>
 
                 <div className="space-y-6">
+                  {(() => {
+                    const copies = selectedBook.copies || [];
+                    const selectedCopy = copies.find((copy) => copy.id === selectedCopyId) || copies[0] || null;
+
+                    return (
+                      <>
                   <div className="rounded-3xl border border-slate-200 p-5">
                     <h4 className="text-lg font-semibold text-slate-900">Catalog Summary</h4>
                     <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
@@ -1148,40 +1166,89 @@ export default function BookList({ user, onLogout }) {
                     {(selectedBook.copies || []).length === 0 ? (
                       <p className="mt-4 text-sm text-slate-600">No copy records are attached yet.</p>
                     ) : (
-                      <div className="mt-4 space-y-3">
-                        {selectedBook.copies.map((copy) => (
-                          <div key={copy.id} className="rounded-2xl bg-slate-50 p-4 text-sm">
+                      <div className="mt-4 space-y-4">
+                        <div className="grid grid-cols-3 gap-2 text-center text-xs font-semibold">
+                          <div className="rounded-2xl bg-slate-50 px-3 py-3 text-slate-700">
+                            {copies.length} Total
+                          </div>
+                          <div className="rounded-2xl bg-emerald-50 px-3 py-3 text-emerald-700">
+                            {copies.filter((copy) => copy.status === 'Available').length} Available
+                          </div>
+                          <div className="rounded-2xl bg-amber-50 px-3 py-3 text-amber-700">
+                            {copies.filter((copy) => copy.status !== 'Available').length} Unavailable
+                          </div>
+                        </div>
+
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-medium text-slate-700">Select a copy</span>
+                          <select
+                            value={selectedCopy?.id || ''}
+                            onChange={(e) => setSelectedCopyId(Number(e.target.value))}
+                            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                          >
+                            {copies.map((copy) => (
+                              <option key={copy.id} value={copy.id}>
+                                Copy #{copy.copy_number || copy.id} - {copy.status}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+
+                        {selectedCopy && (
+                          <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
                             <div className="flex items-start justify-between gap-3">
                               <div>
                                 <p className="font-semibold text-slate-900">
-                                  Copy #{copy.copy_number || copy.id}
+                                  Copy #{selectedCopy.copy_number || selectedCopy.id}
                                 </p>
                                 <p className="mt-1 text-slate-600">
-                                  Barcode: {copy.barcode || 'Not recorded'}
+                                  Barcode: {selectedCopy.barcode || 'Not recorded'}
                                 </p>
                               </div>
                               <span
                                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                                  copy.status === 'Available'
+                                  selectedCopy.status === 'Available'
                                     ? 'bg-emerald-100 text-emerald-700'
                                     : 'bg-amber-100 text-amber-700'
                                 }`}
                               >
-                                {copy.status}
+                                {selectedCopy.status}
                               </span>
                             </div>
-                            {(copy.location_shelf || copy.location_rack || copy.condition) && (
-                              <p className="mt-3 text-slate-600">
-                                {[copy.location_shelf, copy.location_rack, copy.condition]
+
+                            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                              <div className="rounded-xl bg-white p-3">
+                                <p className="text-xs uppercase tracking-wide text-slate-500">Condition</p>
+                                <p className="mt-1 font-medium text-slate-900">
+                                  {selectedCopy.condition || 'Not recorded'}
+                                </p>
+                              </div>
+                              <div className="rounded-xl bg-white p-3">
+                                <p className="text-xs uppercase tracking-wide text-slate-500">Acquired</p>
+                                <p className="mt-1 font-medium text-slate-900">
+                                  {selectedCopy.acquisition_date
+                                    ? formatDisplayDate(selectedCopy.acquisition_date)
+                                    : 'Not recorded'}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="mt-3 rounded-xl bg-white p-3">
+                              <p className="text-xs uppercase tracking-wide text-slate-500">Location</p>
+                              <p className="mt-1 font-medium text-slate-900">
+                                {[selectedCopy.location_shelf, selectedCopy.location_rack]
                                   .filter(Boolean)
-                                  .join(' | ')}
+                                  .join(' | ') || 'Not recorded'}
                               </p>
-                            )}
+                            </div>
                           </div>
-                        ))}
+                        )}
                       </div>
                     )}
                   </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             ) : null}
