@@ -853,17 +853,17 @@ export default function BookList({ user, onLogout }) {
                               {book.available_copies || 0} of {book.total_copies || 0} copies
                             </p>
                           </div>
-                          <div className="flex flex-wrap justify-end gap-2">
-                            <button type="button" onClick={() => handleViewDetails(book.id)} className="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white transition hover:bg-slate-800">
+                          <div className="grid grid-cols-2 gap-2 justify-self-end">
+                            <button type="button" onClick={() => handleViewDetails(book.id)} className="min-w-[92px] rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800">
                               Details
                             </button>
-                            <button type="button" onClick={() => navigate(`/checkout?bookId=${book.id}`)} className="rounded-lg bg-blue-600 px-3 py-2 text-sm text-white transition hover:bg-blue-700">
+                            <button type="button" onClick={() => navigate(`/checkout?bookId=${book.id}`)} className="min-w-[92px] rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
                               Checkout
                             </button>
-                            <button type="button" onClick={() => handleEdit(book.id)} className="rounded-lg bg-amber-500 px-3 py-2 text-sm text-white transition hover:bg-amber-600">
+                            <button type="button" onClick={() => handleEdit(book.id)} className="min-w-[92px] rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-white transition hover:bg-amber-600">
                               Edit
                             </button>
-                            <button type="button" onClick={() => handleDelete(book.id, book.title)} className="rounded-lg bg-red-600 px-3 py-2 text-sm text-white transition hover:bg-red-700">
+                            <button type="button" onClick={() => handleDelete(book.id, book.title)} className="min-w-[92px] rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-700">
                               Delete
                             </button>
                           </div>
@@ -914,17 +914,17 @@ export default function BookList({ user, onLogout }) {
                               {book.category_name && <p>Category: {book.category_name}</p>}
                             </div>
 
-                            <div className="flex flex-wrap gap-2">
-                              <button type="button" onClick={() => handleViewDetails(book.id)} className="rounded-lg bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800">
+                            <div className="grid grid-cols-2 gap-2 sm:max-w-md">
+                              <button type="button" onClick={() => handleViewDetails(book.id)} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800">
                                 View Details
                               </button>
-                              <button type="button" onClick={() => navigate(`/checkout?bookId=${book.id}`)} className="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700">
+                              <button type="button" onClick={() => navigate(`/checkout?bookId=${book.id}`)} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
                                 Checkout
                               </button>
-                              <button type="button" onClick={() => handleEdit(book.id)} className="rounded-lg bg-amber-500 px-4 py-2 text-white transition hover:bg-amber-600">
+                              <button type="button" onClick={() => handleEdit(book.id)} className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-600">
                                 Edit
                               </button>
-                              <button type="button" onClick={() => handleDelete(book.id, book.title)} className="rounded-lg bg-red-600 px-4 py-2 text-white transition hover:bg-red-700">
+                              <button type="button" onClick={() => handleDelete(book.id, book.title)} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700">
                                 Delete
                               </button>
                             </div>
