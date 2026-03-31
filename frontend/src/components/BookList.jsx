@@ -16,6 +16,75 @@ const emptyForm = {
   cover_image_url: ''
 };
 
+const initialFilters = {
+  format: 'all',
+  availability: 'all',
+  language: 'all'
+};
+
+const sortOptions = [
+  { key: 'title', label: 'Title' },
+  { key: 'publication_date', label: 'Publication Date' },
+  { key: 'format', label: 'Format' },
+  { key: 'language', label: 'Language' },
+  { key: 'available_copies', label: 'Availability' }
+];
+
+function getAvailabilityLabel(book) {
+  return (book.available_copies || 0) > 0 ? 'Available' : 'Borrowed';
+}
+
+function formatDisplayDate(value) {
+  if (!value) {
+    return 'Unknown';
+  }
+
+  const parsedDate = new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return value;
+  }
+
+  return parsedDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
+function compareValues(left, right) {
+  if (left === right) {
+    return 0;
+  }
+
+  if (left === null || left === undefined || left === '') {
+    return 1;
+  }
+
+  if (right === null || right === undefined || right === '') {
+    return -1;
+  }
+
+  if (typeof left === 'number' && typeof right === 'number') {
+    return left - right;
+  }
+
+  return String(left).localeCompare(String(right), undefined, {
+    numeric: true,
+    sensitivity: 'base'
+  });
+}
+
+function getAuthorLabel(authors) {
+  if (!Array.isArray(authors) || authors.length === 0) {
+    return 'Unknown author';
+  }
+
+  return authors
+    .map((author) => `${author.first_name || ''} ${author.last_name || ''}`.trim())
+    .filter(Boolean)
+    .join(', ');
+}
+
 export default function BookList({ user, onLogout }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,6 +103,10 @@ export default function BookList({ user, onLogout }) {
   const [formData, setFormData] = useState(emptyForm);
   const [activeLoans, setActiveLoans] = useState([]);
   const [returningLoanId, setReturningLoanId] = useState(null);
+  const [filters, setFilters] = useState(initialFilters);
+  const [sortConfig, setSortConfig] = useState({ key: 'title', direction: 'asc' });
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   useEffect(() => {
     loadBooks();
@@ -111,6 +184,28 @@ export default function BookList({ user, onLogout }) {
     setFormData((current) => ({ ...current, [name]: value }));
   };
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((current) => ({ ...current, [name]: value }));
+  };
+
+  const clearFilters = () => {
+    setFilters(initialFilters);
+  };
+
+  const handleSortChange = (key) => {
+    setSortConfig((current) => {
+      if (current.key === key) {
+        return {
+          key,
+          direction: current.direction === 'asc' ? 'desc' : 'asc'
+        };
+      }
+
+      return { key, direction: 'asc' };
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -172,6 +267,25 @@ export default function BookList({ user, onLogout }) {
     }
   };
 
+  const handleViewDetails = async (bookId) => {
+    try {
+      setDetailLoading(true);
+      setError(null);
+      const response = await booksAPI.getById(bookId);
+      setSelectedBook(response.data);
+    } catch (err) {
+      console.error('Error loading book details:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to load book details');
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const closeDetails = () => {
+    setSelectedBook(null);
+    setDetailLoading(false);
+  };
+
   const handleDelete = async (bookId, title) => {
     const confirmed = window.confirm(`Delete "${title}" from the catalog?`);
     if (!confirmed) return;
@@ -184,6 +298,10 @@ export default function BookList({ user, onLogout }) {
 
       if (editingBookId === bookId) {
         resetForm();
+      }
+
+      if (selectedBook?.id === bookId) {
+        closeDetails();
       }
 
       if (books.length === 1 && page > 1 && !isSearching) {
@@ -223,9 +341,80 @@ export default function BookList({ user, onLogout }) {
     }
   };
 
-  const totalBooks = books.length;
-  const totalCopies = books.reduce((sum, book) => sum + (book.total_copies || 0), 0);
-  const totalAvailableCopies = books.reduce((sum, book) => sum + (book.available_copies || 0), 0);
+  const languageOptions = Array.from(
+    new Set(
+      books
+        .map((book) => String(book.language || '').trim())
+        .filter(Boolean)
+    )
+  ).sort((left, right) => left.localeCompare(right));
+
+  const formatOptions = Array.from(
+    new Set(
+      books
+        .map((book) => String(book.format || '').trim())
+        .filter(Boolean)
+    )
+  ).sort((left, right) => left.localeCompare(right));
+
+  const filteredBooks = books.filter((book) => {
+    if (filters.format !== 'all' && (book.format || 'Unknown') !== filters.format) {
+      return false;
+    }
+
+    if (
+      filters.availability !== 'all' &&
+      getAvailabilityLabel(book).toLowerCase() !== filters.availability
+    ) {
+      return false;
+    }
+
+    if (filters.language !== 'all' && (book.language || 'Unknown') !== filters.language) {
+      return false;
+    }
+
+    return true;
+  });
+
+  const displayedBooks = [...filteredBooks].sort((left, right) => {
+    let leftValue;
+    let rightValue;
+
+    switch (sortConfig.key) {
+      case 'publication_date':
+        leftValue = left.publication_date ? new Date(left.publication_date).getTime() : null;
+        rightValue = right.publication_date ? new Date(right.publication_date).getTime() : null;
+        break;
+      case 'available_copies':
+        leftValue = left.available_copies || 0;
+        rightValue = right.available_copies || 0;
+        break;
+      case 'language':
+        leftValue = left.language || 'Unknown';
+        rightValue = right.language || 'Unknown';
+        break;
+      case 'format':
+        leftValue = left.format || 'Unknown';
+        rightValue = right.format || 'Unknown';
+        break;
+      default:
+        leftValue = left.title || '';
+        rightValue = right.title || '';
+        break;
+    }
+
+    const comparison = compareValues(leftValue, rightValue);
+    if (comparison !== 0) {
+      return sortConfig.direction === 'asc' ? comparison : comparison * -1;
+    }
+
+    return String(left.title || '').localeCompare(String(right.title || ''));
+  });
+
+  const hasActiveFilters = Object.values(filters).some((value) => value !== 'all');
+  const totalBooks = displayedBooks.length;
+  const totalCopies = displayedBooks.reduce((sum, book) => sum + (book.total_copies || 0), 0);
+  const totalAvailableCopies = displayedBooks.reduce((sum, book) => sum + (book.available_copies || 0), 0);
   const totalBorrowedCopies = Math.max(totalCopies - totalAvailableCopies, 0);
 
   const statCards = [
@@ -394,7 +583,7 @@ export default function BookList({ user, onLogout }) {
                   </div>
                 </div>
 
-                <form onSubmit={handleSearch} className="mb-8">
+                <form onSubmit={handleSearch} className="mb-6">
                   <div className="flex flex-col gap-2 sm:flex-row">
                     <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search books by title, ISBN, or description..." className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                     <button type="submit" className="rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700">Search</button>
@@ -402,9 +591,108 @@ export default function BookList({ user, onLogout }) {
                   </div>
                 </form>
 
+                <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Books On Screen</p>
+                      <h3 className="mt-2 text-2xl font-semibold text-slate-900">Sort and Filter the Catalog</h3>
+                      <p className="mt-2 max-w-2xl text-sm text-slate-600">
+                        Use column sorting and dropdown filters to focus on the books currently visible in the dashboard.
+                      </p>
+                    </div>
+                    {hasActiveFilters && (
+                      <button
+                        type="button"
+                        onClick={clearFilters}
+                        className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
+                      >
+                        Clear Filters
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <label className="block">
+                      <span className="mb-1 block text-sm font-medium text-slate-700">Format</span>
+                      <select
+                        name="format"
+                        value={filters.format}
+                        onChange={handleFilterChange}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      >
+                        <option value="all">All formats</option>
+                        {formatOptions.map((format) => (
+                          <option key={format} value={format}>
+                            {format}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="block">
+                      <span className="mb-1 block text-sm font-medium text-slate-700">Availability</span>
+                      <select
+                        name="availability"
+                        value={filters.availability}
+                        onChange={handleFilterChange}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      >
+                        <option value="all">All availability</option>
+                        <option value="available">Available</option>
+                        <option value="borrowed">Borrowed</option>
+                      </select>
+                    </label>
+
+                    <label className="block">
+                      <span className="mb-1 block text-sm font-medium text-slate-700">Language</span>
+                      <select
+                        name="language"
+                        value={filters.language}
+                        onChange={handleFilterChange}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      >
+                        <option value="all">All languages</option>
+                        {languageOptions.map((language) => (
+                          <option key={language} value={language}>
+                            {language}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className="mt-5 flex flex-wrap gap-2 xl:hidden">
+                    {sortOptions.map((option) => {
+                      const isActiveSort = sortConfig.key === option.key;
+                      return (
+                        <button
+                          key={option.key}
+                          type="button"
+                          onClick={() => handleSortChange(option.key)}
+                          className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                            isActiveSort
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          }`}
+                        >
+                          {option.label}
+                          {isActiveSort ? ` (${sortConfig.direction})` : ''}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {isSearching && (
                   <div className="mb-4 text-sm text-gray-600">
                     Showing search results for "{searchQuery.trim()}".
+                  </div>
+                )}
+
+                {(isSearching || hasActiveFilters) && (
+                  <div className="mb-4 text-sm text-slate-600">
+                    Displaying {displayedBooks.length} book{displayedBooks.length === 1 ? '' : 's'}
+                    {hasActiveFilters ? ' after filters' : ''}.
                   </div>
                 )}
 
@@ -412,10 +700,82 @@ export default function BookList({ user, onLogout }) {
                   <div className="rounded-2xl bg-white py-12 text-center shadow-sm">
                     <p className="text-xl text-gray-600">No books found.</p>
                   </div>
+                ) : displayedBooks.length === 0 ? (
+                  <div className="rounded-2xl bg-white py-12 text-center shadow-sm">
+                    <p className="text-xl text-gray-700">No books match the current filters.</p>
+                    <p className="mt-2 text-sm text-gray-500">Try another format, language, or availability option.</p>
+                  </div>
                 ) : (
                   <>
-                    <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-                      {books.map((book) => (
+                    <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm xl:block">
+                      <div className="grid grid-cols-[minmax(0,2.3fr)_1.2fr_1fr_1fr_1.1fr_1.7fr] gap-4 border-b border-slate-200 bg-slate-50 px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                        {sortOptions.map((option) => (
+                          <button
+                            key={option.key}
+                            type="button"
+                            onClick={() => handleSortChange(option.key)}
+                            className="text-left transition hover:text-blue-700"
+                          >
+                            {option.label}
+                            {sortConfig.key === option.key ? ` (${sortConfig.direction})` : ''}
+                          </button>
+                        ))}
+                        <div className="text-right">Actions</div>
+                      </div>
+
+                      {displayedBooks.map((book) => (
+                        <div
+                          key={book.id}
+                          className="grid grid-cols-[minmax(0,2.3fr)_1.2fr_1fr_1fr_1.1fr_1.7fr] gap-4 border-b border-slate-100 px-6 py-5 last:border-b-0"
+                        >
+                          <div>
+                            <h2 className="text-lg font-semibold text-slate-900">{book.title}</h2>
+                            <p className="mt-1 text-sm text-slate-600">
+                              {book.publisher_name || 'Unknown Publisher'}
+                            </p>
+                            <p className="mt-2 text-xs text-slate-500">
+                              {book.isbn ? `ISBN ${book.isbn}` : 'No ISBN recorded'}
+                            </p>
+                          </div>
+                          <div className="text-sm text-slate-700">
+                            {formatDisplayDate(book.publication_date)}
+                          </div>
+                          <div className="text-sm text-slate-700">{book.format || 'Unknown'}</div>
+                          <div className="text-sm text-slate-700">{book.language || 'Unknown'}</div>
+                          <div>
+                            <span
+                              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                                (book.available_copies || 0) > 0
+                                  ? 'bg-emerald-100 text-emerald-700'
+                                  : 'bg-amber-100 text-amber-700'
+                              }`}
+                            >
+                              {getAvailabilityLabel(book)}
+                            </span>
+                            <p className="mt-2 text-xs text-slate-500">
+                              {book.available_copies || 0} of {book.total_copies || 0} copies
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap justify-end gap-2">
+                            <button type="button" onClick={() => handleViewDetails(book.id)} className="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white transition hover:bg-slate-800">
+                              Details
+                            </button>
+                            <button type="button" onClick={() => navigate(`/checkout?bookId=${book.id}`)} className="rounded-lg bg-blue-600 px-3 py-2 text-sm text-white transition hover:bg-blue-700">
+                              Checkout
+                            </button>
+                            <button type="button" onClick={() => handleEdit(book.id)} className="rounded-lg bg-amber-500 px-3 py-2 text-sm text-white transition hover:bg-amber-600">
+                              Edit
+                            </button>
+                            <button type="button" onClick={() => handleDelete(book.id, book.title)} className="rounded-lg bg-red-600 px-3 py-2 text-sm text-white transition hover:bg-red-700">
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 xl:hidden">
+                      {displayedBooks.map((book) => (
                         <div key={book.id} className="rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                           <div className="p-6">
                             <div className="mb-4 flex items-start justify-between gap-3">
@@ -428,40 +788,48 @@ export default function BookList({ user, onLogout }) {
                               </span>
                             </div>
 
+                            <div className="mb-4 grid grid-cols-2 gap-3 text-sm text-gray-700">
+                              <div className="rounded-xl bg-slate-50 p-3">
+                                <p className="text-xs uppercase tracking-wide text-slate-500">Language</p>
+                                <p className="mt-1 font-medium text-slate-900">{book.language || 'Unknown'}</p>
+                              </div>
+                              <div className="rounded-xl bg-slate-50 p-3">
+                                <p className="text-xs uppercase tracking-wide text-slate-500">Published</p>
+                                <p className="mt-1 font-medium text-slate-900">
+                                  {formatDisplayDate(book.publication_date)}
+                                </p>
+                              </div>
+                              <div className="rounded-xl bg-slate-50 p-3">
+                                <p className="text-xs uppercase tracking-wide text-slate-500">Availability</p>
+                                <p className="mt-1 font-medium text-slate-900">{getAvailabilityLabel(book)}</p>
+                              </div>
+                              <div className="rounded-xl bg-slate-50 p-3">
+                                <p className="text-xs uppercase tracking-wide text-slate-500">Copies</p>
+                                <p className="mt-1 font-medium text-slate-900">
+                                  {book.available_copies || 0} / {book.total_copies || 0}
+                                </p>
+                              </div>
+                            </div>
+
                             <div className="mb-4 space-y-2 text-sm text-gray-700">
                               {book.isbn && <p>ISBN: {book.isbn}</p>}
                               {book.pages && <p>Pages: {book.pages}</p>}
                               {book.category_name && <p>Category: {book.category_name}</p>}
-                              {book.publication_date && <p>Published: {book.publication_date}</p>}
                             </div>
 
-                            <div className="mt-4 border-t border-gray-200 pt-4">
-                              <div className="mb-4 flex justify-between">
-                                <div>
-                                  <p className="text-sm text-gray-600">Total Copies</p>
-                                  <p className="text-lg font-bold text-gray-900">{book.total_copies || 0}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">Available</p>
-                                  <p className={`text-lg font-bold ${(book.available_copies || 0) > 0 ? 'text-blue-600' : 'text-red-600'}`}>
-                                    {book.available_copies || 0}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="mb-2 flex gap-2">
-                                <button type="button" onClick={() => navigate(`/checkout?bookId=${book.id}`)} className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700">
-                                  Checkout
-                                </button>
-                                <button type="button" onClick={() => handleEdit(book.id)} className="flex-1 rounded-lg bg-amber-500 px-4 py-2 text-white transition hover:bg-amber-600">
-                                  Edit
-                                </button>
-                              </div>
-                              <div className="flex gap-2">
-                                <button type="button" onClick={() => handleDelete(book.id, book.title)} className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-white transition hover:bg-red-700">
-                                  Delete
-                                </button>
-                              </div>
+                            <div className="flex flex-wrap gap-2">
+                              <button type="button" onClick={() => handleViewDetails(book.id)} className="rounded-lg bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800">
+                                View Details
+                              </button>
+                              <button type="button" onClick={() => navigate(`/checkout?bookId=${book.id}`)} className="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700">
+                                Checkout
+                              </button>
+                              <button type="button" onClick={() => handleEdit(book.id)} className="rounded-lg bg-amber-500 px-4 py-2 text-white transition hover:bg-amber-600">
+                                Edit
+                              </button>
+                              <button type="button" onClick={() => handleDelete(book.id, book.title)} className="rounded-lg bg-red-600 px-4 py-2 text-white transition hover:bg-red-700">
+                                Delete
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -469,7 +837,7 @@ export default function BookList({ user, onLogout }) {
                     </div>
 
                     {!isSearching && totalPages > 1 && (
-                      <div className="flex justify-center gap-2">
+                      <div className="mt-8 flex justify-center gap-2">
                         <button onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1} className="rounded-lg bg-gray-300 px-4 py-2 text-gray-800 transition hover:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50">Previous</button>
                         <div className="flex items-center gap-2">
                           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -553,6 +921,178 @@ export default function BookList({ user, onLogout }) {
           </div>
         </main>
       </div>
+
+      {(detailLoading || selectedBook) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 py-6">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
+            <div className="sticky top-0 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
+                  Book Details
+                </p>
+                <h3 className="mt-1 text-2xl font-semibold text-slate-900">
+                  {selectedBook?.title || 'Loading details'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={closeDetails}
+                className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
+              >
+                Close
+              </button>
+            </div>
+
+            {detailLoading && !selectedBook ? (
+              <div className="px-6 py-16 text-center">
+                <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
+                <p className="mt-4 text-slate-600">Loading book details...</p>
+              </div>
+            ) : selectedBook ? (
+              <div className="grid gap-8 px-6 py-6 lg:grid-cols-[1.2fr_1fr]">
+                <div>
+                  <div className="overflow-hidden rounded-3xl bg-slate-100">
+                    {selectedBook.cover_image_url ? (
+                      <img
+                        src={selectedBook.cover_image_url}
+                        alt={`${selectedBook.title} cover`}
+                        className="h-80 w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-80 items-center justify-center bg-[linear-gradient(135deg,_#dbeafe,_#e2e8f0)] px-8 text-center text-slate-500">
+                        No cover image available
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
+                      {selectedBook.format || 'Unknown format'}
+                    </span>
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
+                      {selectedBook.language || 'Unknown language'}
+                    </span>
+                    <span
+                      className={`rounded-full px-3 py-1 text-sm font-semibold ${
+                        (selectedBook.copies || []).some((copy) => copy.status === 'Available')
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-amber-100 text-amber-700'
+                      }`}
+                    >
+                      {(selectedBook.copies || []).some((copy) => copy.status === 'Available')
+                        ? 'Available copies'
+                        : 'All copies borrowed'}
+                    </span>
+                  </div>
+
+                  <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                    <h4 className="text-lg font-semibold text-slate-900">Description</h4>
+                    <p className="mt-3 text-sm leading-7 text-slate-700">
+                      {selectedBook.description || 'No description has been added for this book yet.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="rounded-3xl border border-slate-200 p-5">
+                    <h4 className="text-lg font-semibold text-slate-900">Catalog Summary</h4>
+                    <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                      <div className="rounded-2xl bg-slate-50 p-4">
+                        <p className="text-slate-500">Publisher</p>
+                        <p className="mt-1 font-semibold text-slate-900">
+                          {selectedBook.publisher_name || 'Unknown Publisher'}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-slate-50 p-4">
+                        <p className="text-slate-500">Category</p>
+                        <p className="mt-1 font-semibold text-slate-900">
+                          {selectedBook.category_name || 'General'}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-slate-50 p-4">
+                        <p className="text-slate-500">Publication Date</p>
+                        <p className="mt-1 font-semibold text-slate-900">
+                          {formatDisplayDate(selectedBook.publication_date)}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-slate-50 p-4">
+                        <p className="text-slate-500">Pages</p>
+                        <p className="mt-1 font-semibold text-slate-900">
+                          {selectedBook.pages || 'Unknown'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-200 p-5">
+                    <h4 className="text-lg font-semibold text-slate-900">Identifiers</h4>
+                    <div className="mt-4 space-y-3 text-sm text-slate-700">
+                      <p>
+                        <span className="font-semibold text-slate-900">ISBN:</span>{' '}
+                        {selectedBook.isbn || 'Not recorded'}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-slate-900">ISBN-13:</span>{' '}
+                        {selectedBook.isbn13 || 'Not recorded'}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-slate-900">Authors:</span>{' '}
+                        {getAuthorLabel(selectedBook.authors)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-200 p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <h4 className="text-lg font-semibold text-slate-900">Copies</h4>
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        {(selectedBook.copies || []).length} total
+                      </span>
+                    </div>
+
+                    {(selectedBook.copies || []).length === 0 ? (
+                      <p className="mt-4 text-sm text-slate-600">No copy records are attached yet.</p>
+                    ) : (
+                      <div className="mt-4 space-y-3">
+                        {selectedBook.copies.map((copy) => (
+                          <div key={copy.id} className="rounded-2xl bg-slate-50 p-4 text-sm">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="font-semibold text-slate-900">
+                                  Copy #{copy.copy_number || copy.id}
+                                </p>
+                                <p className="mt-1 text-slate-600">
+                                  Barcode: {copy.barcode || 'Not recorded'}
+                                </p>
+                              </div>
+                              <span
+                                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                                  copy.status === 'Available'
+                                    ? 'bg-emerald-100 text-emerald-700'
+                                    : 'bg-amber-100 text-amber-700'
+                                }`}
+                              >
+                                {copy.status}
+                              </span>
+                            </div>
+                            {(copy.location_shelf || copy.location_rack || copy.condition) && (
+                              <p className="mt-3 text-slate-600">
+                                {[copy.location_shelf, copy.location_rack, copy.condition]
+                                  .filter(Boolean)
+                                  .join(' | ')}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
