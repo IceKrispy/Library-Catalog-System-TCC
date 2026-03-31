@@ -8,6 +8,7 @@ const emptyForm = {
   title: '',
   isbn: '',
   isbn13: '',
+  authors: '',
   description: '',
   pages: '',
   publication_date: '',
@@ -216,6 +217,10 @@ export default function BookList({ user, onLogout }) {
 
       const payload = {
         ...formData,
+        authors: formData.authors
+          .split(',')
+          .map((value) => value.trim())
+          .filter(Boolean),
         pages: formData.pages ? Number(formData.pages) : null
       };
 
@@ -252,6 +257,12 @@ export default function BookList({ user, onLogout }) {
         title: book.title || '',
         isbn: book.isbn || '',
         isbn13: book.isbn13 || '',
+        authors: Array.isArray(book.authors)
+          ? book.authors
+              .map((author) => `${author.first_name || ''} ${author.last_name || ''}`.trim())
+              .filter(Boolean)
+              .join(', ')
+          : '',
         description: book.description || '',
         pages: book.pages || '',
         publication_date: book.publication_date || '',
@@ -551,6 +562,13 @@ export default function BookList({ user, onLogout }) {
                     <label className="block">
                       <span className="mb-1 block text-sm font-medium text-gray-700">Cover Image URL</span>
                       <input name="cover_image_url" type="url" value={formData.cover_image_url} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                    </label>
+                    <label className="block md:col-span-2">
+                      <span className="mb-1 block text-sm font-medium text-gray-700">Authors</span>
+                      <input name="authors" type="text" value={formData.authors} onChange={handleFormChange} placeholder="Andy Weir, Another Author" className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                      <span className="mt-1 block text-xs text-gray-500">
+                        Separate multiple authors with commas.
+                      </span>
                     </label>
                     <label className="block md:col-span-2">
                       <span className="mb-1 block text-sm font-medium text-gray-700">Description</span>

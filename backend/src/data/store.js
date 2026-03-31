@@ -192,6 +192,104 @@ async function ensureDefaultCategory() {
   });
 }
 
+function normalizeAuthorsInput(authors) {
+  const rawAuthors = Array.isArray(authors)
+    ? authors
+    : String(authors || '')
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean);
+
+  const seen = new Set();
+
+  return rawAuthors
+    .map((entry) => {
+      if (!entry) {
+        return null;
+      }
+
+      const parts = String(entry)
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+      if (parts.length === 0) {
+        return null;
+      }
+
+      const firstName = parts.slice(0, -1).join(' ') || parts[0];
+      const lastName = parts.length > 1 ? parts[parts.length - 1] : '';
+      const key = `${firstName.toLowerCase()}::${lastName.toLowerCase()}`;
+
+      if (seen.has(key)) {
+        return null;
+      }
+
+      seen.add(key);
+      return {
+        first_name: firstName,
+        last_name: lastName
+      };
+    })
+    .filter(Boolean);
+}
+
+async function findOrCreateAuthorId(author) {
+  const { data: existing, error: existingError } = await supabase
+    .from('authors')
+    .select('id')
+    .eq('first_name', author.first_name)
+    .eq('last_name', author.last_name)
+    .limit(1);
+
+  assertNoError(existingError, 'Failed to query author');
+
+  if (existing?.[0]?.id) {
+    return existing[0].id;
+  }
+
+  const { data, error } = await supabase
+    .from('authors')
+    .insert({
+      first_name: author.first_name,
+      last_name: author.last_name
+    })
+    .select('id')
+    .single();
+
+  assertNoError(error, 'Failed to create author');
+  return data.id;
+}
+
+async function syncBookAuthors(bookId, authors) {
+  const normalizedAuthors = normalizeAuthorsInput(authors);
+
+  const { error: deleteError } = await supabase
+    .from('book_authors')
+    .delete()
+    .eq('book_id', Number(bookId));
+
+  assertNoError(deleteError, 'Failed to clear existing book authors');
+
+  if (normalizedAuthors.length === 0) {
+    return;
+  }
+
+  const rows = [];
+  for (const [index, author] of normalizedAuthors.entries()) {
+    const authorId = await findOrCreateAuthorId(author);
+    rows.push({
+      book_id: Number(bookId),
+      author_id: authorId,
+      author_order: index + 1,
+      role: 'Author'
+    });
+  }
+
+  const { error: insertError } = await supabase.from('book_authors').insert(rows);
+  assertNoError(insertError, 'Failed to save book authors');
+}
+
 async function findDuplicateBook(isbn, isbn13, excludedBookId = null) {
   const filters = [];
   const safeIsbn = typeof isbn === 'string' ? isbn.trim() : '';
@@ -480,6 +578,7 @@ async function createBook(payload) {
     .single();
 
   assertNoError(error, 'Failed to create book');
+  await syncBookAuthors(data.id, payload.authors);
   return data;
 }
 
@@ -543,6 +642,11 @@ async function updateBook(id, payload) {
     .single();
 
   assertNoError(error, 'Failed to update book');
+
+  if (payload.authors !== undefined) {
+    await syncBookAuthors(numericId, payload.authors);
+  }
+
   return data;
 }
 
