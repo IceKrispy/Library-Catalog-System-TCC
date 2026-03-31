@@ -36,11 +36,25 @@ export default function LoginPage({ onLogin }) {
     <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,_#dbeafe,_#f8fafc_55%,_#e2e8f0)] px-4 py-10">
       <div className="w-full max-w-md">
         <div className="mb-6 flex justify-center">
-          <img
-            src="/tcc-logo.png"
-            alt="Tagoloan Community College logo"
-            className="h-32 w-32 object-contain drop-shadow-[0_12px_30px_rgba(15,23,42,0.18)] sm:h-40 sm:w-40"
-          />
+          <div className="login-logo-spin login-logo-shell h-36 w-40 sm:h-44 sm:w-48">
+            <img
+              src="/tcc-logo.png"
+              alt=""
+              aria-hidden="true"
+              className="login-logo-back"
+            />
+            <img
+              src="/tcc-logo.png"
+              alt=""
+              aria-hidden="true"
+              className="login-logo-depth"
+            />
+            <img
+              src="/tcc-logo.png"
+              alt="Tagoloan Community College logo"
+              className="login-logo-face"
+            />
+          </div>
         </div>
 
         <div className="rounded-3xl border border-white/70 bg-white/90 p-8 shadow-2xl shadow-slate-200 backdrop-blur">
