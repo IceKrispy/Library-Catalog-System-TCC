@@ -45,6 +45,21 @@ function normalizeBookFormat(format) {
   }
 }
 
+function normalizeCopyCount(value) {
+  if (value === undefined || value === null || value === '') {
+    return 0;
+  }
+
+  const count = Number(value);
+  if (!Number.isFinite(count) || count < 0) {
+    const error = new Error('Copy count must be 0 or greater');
+    error.status = 400;
+    throw error;
+  }
+
+  return Math.floor(count);
+}
+
 function mapBookSummary(row) {
   const publisher = unwrapSingleRelation(row.publisher);
   const category = unwrapSingleRelation(row.category);
@@ -290,6 +305,35 @@ async function syncBookAuthors(bookId, authors) {
   assertNoError(insertError, 'Failed to save book authors');
 }
 
+async function createBookCopies(bookId, copyCount) {
+  const safeCopyCount = normalizeCopyCount(copyCount);
+
+  if (safeCopyCount === 0) {
+    return;
+  }
+
+  const { data: existingCopies, error: existingCopiesError } = await supabase
+    .from('copies')
+    .select('copy_number')
+    .eq('book_id', Number(bookId))
+    .order('copy_number', { ascending: false })
+    .limit(1);
+
+  assertNoError(existingCopiesError, 'Failed to fetch existing book copies');
+
+  const startingCopyNumber = Number(existingCopies?.[0]?.copy_number || 0);
+  const now = Date.now();
+  const rows = Array.from({ length: safeCopyCount }, (_, index) => ({
+    book_id: Number(bookId),
+    barcode: `BOOK-${bookId}-${now}-${startingCopyNumber + index + 1}`,
+    copy_number: startingCopyNumber + index + 1,
+    status: 'Available'
+  }));
+
+  const { error } = await supabase.from('copies').insert(rows);
+  assertNoError(error, 'Failed to create book copies');
+}
+
 async function findDuplicateBook(isbn, isbn13, excludedBookId = null) {
   const filters = [];
   const safeIsbn = typeof isbn === 'string' ? isbn.trim() : '';
@@ -520,6 +564,7 @@ async function getBookByISBN(isbn) {
 }
 
 async function createBook(payload) {
+  const copyCount = normalizeCopyCount(payload.copy_count);
   const duplicate = await findDuplicateBook(payload.isbn, payload.isbn13);
   if (duplicate) {
     const error = new Error('ISBN already exists in catalog');
@@ -579,11 +624,13 @@ async function createBook(payload) {
 
   assertNoError(error, 'Failed to create book');
   await syncBookAuthors(data.id, payload.authors);
+  await createBookCopies(data.id, copyCount);
   return data;
 }
 
 async function updateBook(id, payload) {
   const numericId = Number(id);
+  const additionalCopies = normalizeCopyCount(payload.additional_copies);
   const { data: existing, error: existingError } = await supabase
     .from('books')
     .select('id, isbn, isbn13')
@@ -645,6 +692,10 @@ async function updateBook(id, payload) {
 
   if (payload.authors !== undefined) {
     await syncBookAuthors(numericId, payload.authors);
+  }
+
+  if (additionalCopies > 0) {
+    await createBookCopies(numericId, additionalCopies);
   }
 
   return data;

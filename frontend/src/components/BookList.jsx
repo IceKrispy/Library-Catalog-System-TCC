@@ -9,6 +9,8 @@ const emptyForm = {
   isbn: '',
   isbn13: '',
   authors: '',
+  copy_count: '0',
+  additional_copies: '0',
   description: '',
   pages: '',
   publication_date: '',
@@ -32,7 +34,35 @@ const sortOptions = [
 ];
 
 function getAvailabilityLabel(book) {
-  return (book.available_copies || 0) > 0 ? 'Available' : 'Borrowed';
+  const totalCopies = Number(
+    book.total_copies ?? (Array.isArray(book.copies) ? book.copies.length : 0)
+  );
+  const availableCopies = Number(
+    book.available_copies ??
+      (Array.isArray(book.copies)
+        ? book.copies.filter((copy) => copy.status === 'Available').length
+        : 0)
+  );
+
+  if (totalCopies === 0) {
+    return 'No copies';
+  }
+
+  return availableCopies > 0 ? 'Available' : 'Borrowed';
+}
+
+function getAvailabilityBadgeClasses(book) {
+  const label = getAvailabilityLabel(book);
+
+  if (label === 'Available') {
+    return 'bg-emerald-100 text-emerald-700';
+  }
+
+  if (label === 'Borrowed') {
+    return 'bg-amber-100 text-amber-700';
+  }
+
+  return 'bg-slate-100 text-slate-600';
 }
 
 function formatDisplayDate(value) {
@@ -182,6 +212,13 @@ export default function BookList({ user, onLogout }) {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === 'copy_count' || name === 'additional_copies') {
+      const normalizedValue = value === '' ? '0' : String(Math.max(0, Number(value) || 0));
+      setFormData((current) => ({ ...current, [name]: normalizedValue }));
+      return;
+    }
+
     setFormData((current) => ({ ...current, [name]: value }));
   };
 
@@ -221,12 +258,18 @@ export default function BookList({ user, onLogout }) {
           .split(',')
           .map((value) => value.trim())
           .filter(Boolean),
+        copy_count: Math.max(0, Number(formData.copy_count) || 0),
+        additional_copies: Math.max(0, Number(formData.additional_copies) || 0),
         pages: formData.pages ? Number(formData.pages) : null
       };
 
       if (editingBookId) {
         await booksAPI.update(editingBookId, payload);
-        setSuccessMessage('Book updated successfully.');
+        setSuccessMessage(
+          payload.additional_copies > 0
+            ? `Book updated successfully and ${payload.additional_copies} copie${payload.additional_copies === 1 ? 'y was' : 's were'} added.`
+            : 'Book updated successfully.'
+        );
       } else {
         await booksAPI.create(payload);
         setSuccessMessage('Book added successfully.');
@@ -263,6 +306,8 @@ export default function BookList({ user, onLogout }) {
               .filter(Boolean)
               .join(', ')
           : '',
+        copy_count: String(book.copies?.length || 0),
+        additional_copies: '0',
         description: book.description || '',
         pages: book.pages || '',
         publication_date: book.publication_date || '',
@@ -543,6 +588,43 @@ export default function BookList({ user, onLogout }) {
                       <input name="pages" type="number" min="1" value={formData.pages} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                     </label>
                     <label className="block">
+                      <span className="mb-1 block text-sm font-medium text-gray-700">
+                        {editingBookId ? 'Current Copies' : 'Number of Copies'}
+                      </span>
+                      <input
+                        name="copy_count"
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={formData.copy_count}
+                        onChange={handleFormChange}
+                        disabled={Boolean(editingBookId)}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-gray-100"
+                      />
+                      <span className="mt-1 block text-xs text-gray-500">
+                        {editingBookId
+                          ? 'This is the current total. Editing a book will not reduce these existing copies.'
+                          : 'Minimum is 0. Negative values are not allowed.'}
+                      </span>
+                    </label>
+                    {editingBookId && (
+                      <label className="block">
+                        <span className="mb-1 block text-sm font-medium text-gray-700">Add More Copies</span>
+                        <input
+                          name="additional_copies"
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={formData.additional_copies}
+                          onChange={handleFormChange}
+                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        />
+                        <span className="mt-1 block text-xs text-gray-500">
+                          This adds copies on top of the current total. It cannot go below 0 or reduce existing stock.
+                        </span>
+                      </label>
+                    )}
+                    <label className="block">
                       <span className="mb-1 block text-sm font-medium text-gray-700">Publication Date</span>
                       <input name="publication_date" type="date" value={formData.publication_date} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
                     </label>
@@ -658,6 +740,7 @@ export default function BookList({ user, onLogout }) {
                         <option value="all">All availability</option>
                         <option value="available">Available</option>
                         <option value="borrowed">Borrowed</option>
+                        <option value="no copies">No copies</option>
                       </select>
                     </label>
 
@@ -762,11 +845,7 @@ export default function BookList({ user, onLogout }) {
                           <div className="text-sm text-slate-700">{book.language || 'Unknown'}</div>
                           <div>
                             <span
-                              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                                (book.available_copies || 0) > 0
-                                  ? 'bg-emerald-100 text-emerald-700'
-                                  : 'bg-amber-100 text-amber-700'
-                              }`}
+                              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getAvailabilityBadgeClasses(book)}`}
                             >
                               {getAvailabilityLabel(book)}
                             </span>
@@ -991,15 +1070,13 @@ export default function BookList({ user, onLogout }) {
                       {selectedBook.language || 'Unknown language'}
                     </span>
                     <span
-                      className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                        (selectedBook.copies || []).some((copy) => copy.status === 'Available')
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-amber-100 text-amber-700'
-                      }`}
+                      className={`rounded-full px-3 py-1 text-sm font-semibold ${getAvailabilityBadgeClasses(selectedBook)}`}
                     >
-                      {(selectedBook.copies || []).some((copy) => copy.status === 'Available')
+                      {getAvailabilityLabel(selectedBook) === 'Available'
                         ? 'Available copies'
-                        : 'All copies borrowed'}
+                        : getAvailabilityLabel(selectedBook) === 'Borrowed'
+                          ? 'All copies borrowed'
+                          : 'No copies added yet'}
                     </span>
                   </div>
 

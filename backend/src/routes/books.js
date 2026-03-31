@@ -37,7 +37,8 @@ router.post('/', async (req, res) => {
       format,
       is_digital,
       cover_image_url,
-      authors
+      authors,
+      copy_count
     } = req.body;
 
     if (!title || title.trim() === '') {
@@ -61,7 +62,8 @@ router.post('/', async (req, res) => {
       format,
       is_digital,
       cover_image_url,
-      authors
+      authors,
+      copy_count
     });
 
     res.status(201).json({
