@@ -139,6 +139,7 @@ export default function BookList({ user, onLogout }) {
   const [selectedBook, setSelectedBook] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [selectedCopyId, setSelectedCopyId] = useState(null);
+  const [isAddBookOpen, setIsAddBookOpen] = useState(false);
 
   useEffect(() => {
     loadBooks();
@@ -191,6 +192,37 @@ export default function BookList({ user, onLogout }) {
   const resetForm = () => {
     setFormData(emptyForm);
     setEditingBookId(null);
+    setIsAddBookOpen(false);
+  };
+
+  const clearFormFields = () => {
+    if (editingBookId) {
+      setFormData((current) => ({
+        ...current,
+        title: '',
+        isbn: '',
+        isbn13: '',
+        authors: '',
+        additional_copies: '0',
+        description: '',
+        pages: '',
+        publication_date: '',
+        language: 'English',
+        format: 'Hardcover',
+        cover_image_url: ''
+      }));
+      return;
+    }
+
+    setFormData(emptyForm);
+  };
+
+  const handleOpenAddBook = () => {
+    setError(null);
+    setSuccessMessage('');
+    setEditingBookId(null);
+    setFormData(emptyForm);
+    setIsAddBookOpen(true);
   };
 
   const handleSearch = async (e) => {
@@ -297,6 +329,7 @@ export default function BookList({ user, onLogout }) {
       const book = response.data;
 
       setEditingBookId(bookId);
+      setIsAddBookOpen(true);
       setFormData({
         title: book.title || '',
         isbn: book.isbn || '',
@@ -317,7 +350,6 @@ export default function BookList({ user, onLogout }) {
         cover_image_url: book.cover_image_url || ''
       });
       setSearchParams({ view: 'dashboard' });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error('Error loading book details:', err);
       setError(err.response?.data?.message || err.message || 'Failed to load book details');
@@ -515,15 +547,26 @@ export default function BookList({ user, onLogout }) {
                       : 'Review active loans and return borrowed items from a cleaner, focused view.'}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSearchParams({ view: activeView === 'dashboard' ? 'borrowed' : 'dashboard' })
-                  }
-                  className="rounded-2xl bg-white px-5 py-3 font-semibold text-slate-900 transition hover:bg-blue-50"
-                >
-                  {activeView === 'dashboard' ? 'Open Borrowed Books' : 'Back to Dashboard'}
-                </button>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  {activeView === 'dashboard' && (
+                    <button
+                      type="button"
+                      onClick={handleOpenAddBook}
+                      className="rounded-2xl bg-blue-500 px-5 py-3 font-semibold text-white transition hover:bg-blue-400"
+                    >
+                      Add Book
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSearchParams({ view: activeView === 'dashboard' ? 'borrowed' : 'dashboard' })
+                    }
+                    className="rounded-2xl bg-white px-5 py-3 font-semibold text-slate-900 transition hover:bg-blue-50"
+                  >
+                    {activeView === 'dashboard' ? 'Open Borrowed Books' : 'Back to Dashboard'}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -550,142 +593,6 @@ export default function BookList({ user, onLogout }) {
 
             {activeView === 'dashboard' ? (
               <>
-                <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                  <div className="mb-4 flex items-center justify-between gap-4">
-                    <div>
-                      <h3 className="text-2xl font-semibold text-gray-900">
-                        {editingBookId ? 'Edit Book' : 'Add Book'}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {editingBookId
-                          ? 'Update the selected book and save your changes.'
-                          : 'Create a new catalog entry with the main book details.'}
-                      </p>
-                    </div>
-                    {editingBookId && (
-                      <button
-                        type="button"
-                        onClick={resetForm}
-                        className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-200"
-                      >
-                        Cancel Edit
-                      </button>
-                    )}
-                  </div>
-
-                  <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">Title</span>
-                      <input required name="title" type="text" value={formData.title} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                    </label>
-                    <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">ISBN</span>
-                      <input name="isbn" type="text" value={formData.isbn} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                    </label>
-                    <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">ISBN-13</span>
-                      <input name="isbn13" type="text" value={formData.isbn13} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                    </label>
-                    <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">Pages</span>
-                      <input name="pages" type="number" min="1" value={formData.pages} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                    </label>
-                    <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">
-                        {editingBookId ? 'Current Copies' : 'Number of Copies'}
-                      </span>
-                      <input
-                        name="copy_count"
-                        type="number"
-                        min="0"
-                        step="1"
-                        value={formData.copy_count}
-                        onChange={handleFormChange}
-                        disabled={Boolean(editingBookId)}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-gray-100"
-                      />
-                      <span className="mt-1 block text-xs text-gray-500">
-                        {editingBookId
-                          ? 'This is the current total. Editing a book will not reduce these existing copies.'
-                          : 'Minimum is 0. Negative values are not allowed.'}
-                      </span>
-                    </label>
-                    {editingBookId && (
-                      <label className="block">
-                        <span className="mb-1 block text-sm font-medium text-gray-700">Add More Copies</span>
-                        <input
-                          name="additional_copies"
-                          type="number"
-                          min="0"
-                          step="1"
-                          value={formData.additional_copies}
-                          onChange={handleFormChange}
-                          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                        />
-                        <span className="mt-1 block text-xs text-gray-500">
-                          This adds copies on top of the current total. It cannot go below 0 or reduce existing stock.
-                        </span>
-                      </label>
-                    )}
-                    <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">Publication Date</span>
-                      <input name="publication_date" type="date" value={formData.publication_date} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                    </label>
-                    <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">Language</span>
-                      <input name="language" type="text" value={formData.language} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                    </label>
-                    <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">Format</span>
-                      <select name="format" value={formData.format} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                        <option value="Hardcover">Hardcover</option>
-                        <option value="Paperback">Paperback</option>
-                        <option value="E-book">E-book</option>
-                        <option value="Audiobook">Audiobook</option>
-                      </select>
-                    </label>
-                    <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">Cover Image URL</span>
-                      <input name="cover_image_url" type="url" value={formData.cover_image_url} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                    </label>
-                    <label className="block md:col-span-2">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">Authors</span>
-                      <input name="authors" type="text" value={formData.authors} onChange={handleFormChange} placeholder="Andy Weir, Another Author" className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                      <span className="mt-1 block text-xs text-gray-500">
-                        Separate multiple authors with commas.
-                      </span>
-                    </label>
-                    <label className="block md:col-span-2">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">Description</span>
-                      <textarea name="description" rows="4" value={formData.description} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                    </label>
-                    <div className="flex flex-wrap gap-3 md:col-span-2">
-                      <button type="submit" disabled={isSubmitting} className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
-                        {isSubmitting ? 'Saving...' : editingBookId ? 'Update Book' : 'Add Book'}
-                      </button>
-                      <button type="button" onClick={resetForm} className="rounded-lg bg-gray-200 px-6 py-2 font-medium text-gray-800 transition hover:bg-gray-300">
-                        Clear Form
-                      </button>
-                    </div>
-                  </form>
-                </div>
-
-                <div className="mb-8 rounded-2xl border border-blue-200 bg-white p-6 shadow-sm">
-                  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-blue-700">Separated Tools</p>
-                  <h3 className="mt-2 text-2xl font-semibold text-slate-900">Cleaner Workflow</h3>
-                  <p className="mt-2 text-sm text-slate-600">
-                    Checkout is now on its own circulation page, and automated due dates live under settings.
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    <button type="button" onClick={() => navigate('/checkout')} className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
-                      Open Checkout Page
-                    </button>
-                    <button type="button" onClick={() => navigate('/settings')} className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
-                      Open Settings Page
-                    </button>
-                  </div>
-                </div>
-
                 <form onSubmit={handleSearch} className="mb-6">
                   <div className="flex flex-col gap-2 sm:flex-row">
                     <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search books by title, ISBN, or description..." className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
@@ -1252,6 +1159,136 @@ export default function BookList({ user, onLogout }) {
                 </div>
               </div>
             ) : null}
+          </div>
+        </div>
+      )}
+
+      {isAddBookOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 py-6">
+          <div className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
+            <div className="sticky top-0 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
+                  Catalog Tools
+                </p>
+                <h3 className="mt-1 text-2xl font-semibold text-slate-900">
+                  {editingBookId ? 'Edit Book' : 'Add Book'}
+                </h3>
+                <p className="mt-1 text-sm text-slate-600">
+                  {editingBookId
+                    ? 'Update the selected book and save your changes.'
+                    : 'Create a new catalog entry in a focused popup form.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="px-6 py-6">
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">Title</span>
+                  <input required name="title" type="text" value={formData.title} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">ISBN</span>
+                  <input name="isbn" type="text" value={formData.isbn} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">ISBN-13</span>
+                  <input name="isbn13" type="text" value={formData.isbn13} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">Pages</span>
+                  <input name="pages" type="number" min="1" value={formData.pages} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">
+                    {editingBookId ? 'Current Copies' : 'Number of Copies'}
+                  </span>
+                  <input
+                    name="copy_count"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={formData.copy_count}
+                    onChange={handleFormChange}
+                    disabled={Boolean(editingBookId)}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-gray-100"
+                  />
+                  <span className="mt-1 block text-xs text-gray-500">
+                    {editingBookId
+                      ? 'This is the current total. Editing a book will not reduce these existing copies.'
+                      : 'Minimum is 0. Negative values are not allowed.'}
+                  </span>
+                </label>
+                {editingBookId && (
+                  <label className="block">
+                    <span className="mb-1 block text-sm font-medium text-gray-700">Add More Copies</span>
+                    <input
+                      name="additional_copies"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={formData.additional_copies}
+                      onChange={handleFormChange}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    />
+                    <span className="mt-1 block text-xs text-gray-500">
+                      This adds copies on top of the current total. It cannot go below 0 or reduce existing stock.
+                    </span>
+                  </label>
+                )}
+                <label className="block">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">Publication Date</span>
+                  <input name="publication_date" type="date" value={formData.publication_date} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">Language</span>
+                  <input name="language" type="text" value={formData.language} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">Format</span>
+                  <select name="format" value={formData.format} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                    <option value="Hardcover">Hardcover</option>
+                    <option value="Paperback">Paperback</option>
+                    <option value="E-book">E-book</option>
+                    <option value="Audiobook">Audiobook</option>
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">Cover Image URL</span>
+                  <input name="cover_image_url" type="url" value={formData.cover_image_url} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                </label>
+                <label className="block md:col-span-2">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">Authors</span>
+                  <input name="authors" type="text" value={formData.authors} onChange={handleFormChange} placeholder="Andy Weir, Another Author" className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                  <span className="mt-1 block text-xs text-gray-500">
+                    Separate multiple authors with commas.
+                  </span>
+                </label>
+                <label className="block md:col-span-2">
+                  <span className="mb-1 block text-sm font-medium text-gray-700">Description</span>
+                  <textarea name="description" rows="4" value={formData.description} onChange={handleFormChange} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                </label>
+                <div className="flex flex-wrap gap-3 md:col-span-2">
+                  <button type="submit" disabled={isSubmitting} className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+                    {isSubmitting ? 'Saving...' : editingBookId ? 'Update Book' : 'Add Book'}
+                  </button>
+                  <button type="button" onClick={clearFormFields} className="rounded-lg bg-gray-200 px-6 py-2 font-medium text-gray-800 transition hover:bg-gray-300">
+                    {editingBookId ? 'Clear Changes' : 'Clear Form'}
+                  </button>
+                  <button type="button" onClick={resetForm} className="rounded-lg bg-slate-100 px-6 py-2 font-medium text-slate-700 transition hover:bg-slate-200">
+                    {editingBookId ? 'Cancel Edit' : 'Close'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
